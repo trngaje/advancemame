@@ -2530,6 +2530,17 @@ bool int_clip_is_active(int index)
 unsigned int_put_width(font_t font, char c)
 {
 	adv_bitmap* src = int_font[font]->data[(unsigned char)c];
+	
+	if (int_orientation & ADV_ORIENTATION_FLIP_XY)
+		return src->size_y;
+	else
+		return src->size_x;
+}
+
+unsigned int_put_kor_width(font_t font, unsigned short c)
+{
+	adv_bitmap* src = int_font[font]->data[c];
+	
 	if (int_orientation & ADV_ORIENTATION_FLIP_XY)
 		return src->size_y;
 	else
@@ -2539,8 +2550,20 @@ unsigned int_put_width(font_t font, char c)
 unsigned int_put_width(font_t font, const string& s)
 {
 	unsigned size = 0;
+	unsigned short c;
+	
 	for (unsigned i = 0; i < s.length(); ++i)
-		size += int_put_width(font, s[i]);
+	{
+		c = utf8_to_unicode(s[i], s[i+1], s[i+2]);
+		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+		{
+			size += int_put_kor_width(font, (c-0xac00+0x80) & 0xffff);
+			i += 2;
+		}
+		else
+			size += int_put_width(font, (unsigned char)(s[i]));
+	}
+	
 	return size;
 }
 
@@ -2559,6 +2582,24 @@ void int_put(font_t font, int x, int y, char c, const int_color& color)
 		assert(x >= 0 && y >= 0 && x + src->size_x <= video_size_x() && y + src->size_y <= video_size_y());
 
 		adv_font_put_char_map(int_font[font], video_foreground_bitmap, x, y, c, color.opaque);
+	}
+}
+
+void int_put_kor(font_t font, int x, int y, unsigned short c, const int_color& color)
+{
+	if (x >= 0 && y >= 0 && x + int_put_kor_width(font, c) <= int_dx_get() && y + int_font_dy_get(font) <= int_dy_get()) {
+		adv_bitmap* src = int_font[font]->data[c];
+
+		if (int_orientation & ADV_ORIENTATION_FLIP_XY)
+			swap(x, y);
+		if (int_orientation & ADV_ORIENTATION_FLIP_X)
+			x = video_size_x() - src->size_x - x;
+		if (int_orientation & ADV_ORIENTATION_FLIP_Y)
+			y = video_size_y() - src->size_y - y;
+
+		assert(x >= 0 && y >= 0 && x + src->size_x <= video_size_x() && y + src->size_y <= video_size_y());
+
+		adv_font_put_kor_char_map(int_font[font], video_foreground_bitmap, x, y, c, color.opaque);
 	}
 }
 
@@ -2586,6 +2627,38 @@ void int_put_alpha(font_t font, int x, int y, char c, const int_color& color)
 			adv_bitmap_free(flat);
 		} else {
 			adv_font_put_char_map(int_font[font], video_foreground_bitmap, x, y, c, color.opaque);
+		}
+	}
+}
+
+
+void int_put_kor_alpha(font_t font, int x, int y, unsigned short c, const int_color& color)
+{
+	if (x >= 0 && y >= 0 && x + int_put_kor_width(font, c) <= int_dx_get() && y + int_font_dy_get(font) <= int_dy_get()) {
+		adv_bitmap* src = int_font[font]->data[c];
+		
+		if (src)
+		{
+			if (int_orientation & ADV_ORIENTATION_FLIP_XY)
+				swap(x, y);
+			if (int_orientation & ADV_ORIENTATION_FLIP_X)
+				x = video_size_x() - src->size_x - x;
+			if (int_orientation & ADV_ORIENTATION_FLIP_Y)
+				y = video_size_y() - src->size_y - y;
+
+			assert(x >= 0 && y >= 0 && x + src->size_x <= video_size_x() && y + src->size_y <= video_size_y());
+
+			if (video_alpha_flag) {
+				adv_bitmap* flat = adv_bitmap_alloc(src->size_x, src->size_y, video_alpha_bytes_per_pixel);
+
+				adv_font_put_kor_char_map(int_font[font], flat, 0, 0, c, color.alpha);
+
+				adv_bitmap_put_alphaback(video_foreground_bitmap, x, y, video_color_def(), video_background_bitmap, x, y, flat, 0, 0, flat->size_x, flat->size_y, video_alpha_color_def);
+
+				adv_bitmap_free(flat);
+			} else {
+				adv_font_put_kor_char_map(int_font[font], video_foreground_bitmap, x, y, c, color.opaque);
+			}
 		}
 	}
 }
@@ -2669,6 +2742,7 @@ void int_put_special_center(font_t font, bool& in, int x, int y, int dx, const s
 
 void int_put_special_alpha(font_t font, bool& in, int x, int y, int dx, const string& s, const int_color& c0, const int_color& c1, const int_color& c2)
 {
+	unsigned short c;
 	for (unsigned i = 0; i < s.length(); ++i) {
 		if (int_put_width(font, s[i]) <= dx) {
 			if (s[i] == '(' || s[i] == '[')
@@ -2676,7 +2750,17 @@ void int_put_special_alpha(font_t font, bool& in, int x, int y, int dx, const st
 			if (!in && isupper(s[i])) {
 				int_put_alpha(font, x, y, s[i], c0);
 			} else {
-				int_put_alpha(font, x, y, s[i], in ? c1 : c2);
+				c = utf8_to_unicode(s[i], s[i+1], s[i+2]);
+				if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+				{
+					if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+					{
+						int_put_kor_alpha(font, x, y, (c-0xac00+0x80) & 0xffff, in ? c1 : c2);
+						i+=2;
+					}
+				}
+				else
+					int_put_alpha(font, x, y, s[i], in ? c1 : c2);
 			}
 			x += int_put_width(font, s[i]);
 			dx -= int_put_width(font, s[i]);
@@ -2700,21 +2784,68 @@ void int_put(font_t font, int x, int y, const string& s, const int_color& color)
 
 void int_put_alpha(font_t font, int x, int y, const string& s, const int_color& color)
 {
+	unsigned short c;
+	
 	for (unsigned i = 0; i < s.length(); ++i) {
-		int_put_alpha(font, x, y, s[i], color);
-		x += int_put_width(font, s[i]);
+		c = utf8_to_unicode(s[i], s[i+1], s[i+2]);
+		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+		{
+			if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+			{
+				int_put_kor_alpha(font, x, y, (c-0xac00+0x80) & 0xffff, color);
+				x += int_put_kor_width(font, (c-0xac00+0x80) & 0xffff);	
+				i+=2;
+			}
+			else{
+				x += int_put_width(font, s[i]);				
+			}
+		}
+		else{
+			int_put_alpha(font, x, y, s[i], color);
+			x += int_put_width(font, s[i]);
+		}
 	}
+}
+
+unsigned short utf8_to_unicode(unsigned char c1, unsigned char c2, unsigned char c3)
+{
+	unsigned short c=0;
+	
+	if ((c1 & 0xf0) == 0xe0)
+		if ((c2 & 0xc0) == 0x80)
+			if ((c3 & 0xc0) == 0x80)
+			{
+				c = ((c1 & 0xf) << 12) | ((c2 & 0x3f) << 6) | (c3 & 0x3f);
+				return c;
+			}
+			
+	return 0;
 }
 
 unsigned int_put(font_t font, int x, int y, int dx, const string& s, const int_color& color)
 {
+	unsigned short c;
+	
 	for (unsigned i = 0; i < s.length(); ++i) {
 		int width = int_put_width(font, s[i]);
 		if (width > dx)
 			return i;
-		int_put(font, x, y, s[i], color);
-		x += width;
-		dx -= width;
+		
+		c = utf8_to_unicode(s[i], s[i+1], s[i+2]);
+		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+		{
+			int_put_kor(font, x, y, (c-0xac00+0x80) & 0xffff, color);
+			width = int_put_kor_width(font, (c-0xac00+0x80) & 0xffff);
+			x += width;
+			dx -= width;
+			i+=2;
+		}
+		else
+		{
+			int_put(font, x, y, s[i], color);
+			x += width;
+			dx -= width;
+		}
 	}
 	return s.length();
 }

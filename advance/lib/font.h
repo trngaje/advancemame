@@ -45,7 +45,8 @@ extern "C" {
 /**
  * Max number of chars in a font.
  */
-#define ADV_FONT_MAX 256
+//#define ADV_FONT_MAX 256
+#define ADV_FONT_MAX (128 + 0xd7a3 - 0xac00 + 1)
 
 /**
  * Fixed width space.
@@ -63,7 +64,7 @@ typedef struct adv_font_struct {
 /*@{*/
 
 adv_font* adv_font_load(adv_fz* f, unsigned sizex, unsigned sizey);
-void adv_font_set_char(adv_font* font, char c, adv_bitmap* bitmap);
+void adv_font_set_char(adv_font* font, unsigned short/*char*/ c, adv_bitmap* bitmap);
 void adv_font_free(adv_font* font);
 
 unsigned adv_font_sizex(adv_font* font);
@@ -82,6 +83,7 @@ void adv_font_put_char(adv_font* font, adv_bitmap* dst, int x, int y, char c, un
 void adv_font_put_string(adv_font* font, adv_bitmap* dst, int x, int y, const char* begin, const char* end, unsigned color_front, unsigned color_back);
 void adv_font_put_string_oriented(adv_font* font, adv_bitmap* dst, int x, int y, const char* begin, const char* end, unsigned color_front, unsigned color_back, unsigned orientation);
 void adv_font_put_char_map(adv_font* font, adv_bitmap* dst, int x, int y, char c, const adv_pixel* map);
+void adv_font_put_kor_char_map(adv_font* font, adv_bitmap* dst, int x, int y, unsigned short c, const adv_pixel* map);
 void adv_font_put_string_map(adv_font* font, adv_bitmap* dst, int x, int y, const char* begin, const char* end, const adv_pixel* map);
 void adv_font_put_char_trasp(adv_font* font, adv_bitmap* dst, int x, int y, char c, unsigned color_front);
 void adv_font_put_string_trasp(adv_font* font, adv_bitmap* dst, int x, int y, const char* begin, const char* end, unsigned color_front);

@@ -70,14 +70,17 @@ typedef enum {
 } font_t;
 
 unsigned int_put_width(font_t font, char c);
+unsigned int_put_kor_width(font_t font, unsigned short c);
 unsigned int_put_width(font_t font, const std::string& s);
 void int_put(font_t font, int x, int y, char c, const int_color& color);
+void int_put_kor(font_t font, int x, int y, unsigned short c, const int_color& color);
 void int_put(font_t font, int x, int y, const std::string& s, const int_color& color);
 void int_put_filled(font_t font, int x, int y, int dx, const std::string& s, const int_color& color);
 void int_put_filled_center(font_t font, int x, int y, int dx, const std::string& s, const int_color& color);
 void int_put_special(font_t font, bool& in, int x, int y, int dx, const std::string& s, const int_color& c0, const int_color& c1, const int_color& c2);
 void int_put_special_center(font_t font, bool& in, int x, int y, int dx, const std::string& s, const int_color& c0, const int_color& c1, const int_color& c2);
 void int_put_alpha(font_t font, int x, int y, char c, const int_color& color);
+void int_put_kor_alpha(font_t font, int x, int y, unsigned short c, const int_color& color);
 void int_put_alpha(font_t font, int x, int y, const std::string& s, const int_color& color);
 void int_put_filled_alpha(font_t font, int x, int y, int dx, const std::string& s, const int_color& color);
 void int_put_special_alpha(font_t font, bool& in, int x, int y, int dx, const std::string& s, const int_color& c0, const int_color& c1, const int_color& c2);
@@ -122,5 +125,6 @@ int int_font_dy_get(font_t font);
 int int_dx_get();
 int int_dy_get();
 
+unsigned short utf8_to_unicode(unsigned char c1, unsigned char c2, unsigned char c3);
 #endif
 

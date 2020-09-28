@@ -76,6 +76,13 @@ extern "C" {
 #define JOYB_GEAR_UP 144 /* wheel */
 #define JOYB_PLAY 145 /* play */
 
+#define JOYB_HAPPY1 146
+#define JOYB_HAPPY2 147
+#define JOYB_HAPPY3 148
+#define JOYB_HAPPY4 149
+#define JOYB_HAPPY5 150
+#define JOYB_HAPPY6 151
+
 #define JOYB_MAX 256
 /*@}*/
 

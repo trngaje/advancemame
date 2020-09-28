@@ -384,6 +384,19 @@ static adv_error joystickb_setup(struct joystick_item_context* item, int f)
 		const char* name;
 		int bind;
 	} override_map[] = {
+		{ 0x0001, 0x0001, "odroidgo2_joypad", 1, "a", JOYB_A },
+		{ 0x0001, 0x0001, "odroidgo2_joypad", 0, "b", JOYB_B },
+		{ 0x0001, 0x0001, "odroidgo2_joypad", 2, "x", JOYB_X },
+		{ 0x0001, 0x0001, "odroidgo2_joypad", 3, "y", JOYB_Y },
+		{ 0x0001, 0x0001, "odroidgo2_joypad", 4, "tl", JOYB_TL },
+		{ 0x0001, 0x0001, "odroidgo2_joypad", 5, "tr", JOYB_TR },
+		{ 0x0001, 0x0001, "odroidgo2_joypad", 10, "happy1", JOYB_HAPPY1 },
+		{ 0x0001, 0x0001, "odroidgo2_joypad", 11, "happy2", JOYB_HAPPY2 },
+		{ 0x0001, 0x0001, "odroidgo2_joypad", 12, "happy3", JOYB_HAPPY3 },
+		{ 0x0001, 0x0001, "odroidgo2_joypad", 13, "happy4", JOYB_HAPPY4 },
+		{ 0x0001, 0x0001, "odroidgo2_joypad", 14, "happy5", JOYB_HAPPY5 },
+		{ 0x0001, 0x0001, "odroidgo2_joypad", 15, "happy6", JOYB_HAPPY6 },
+		
 		/* QMOX SNES */
 		{ 0x0810, 0xe501, "usb gamepad           ", 1, "a", JOYB_A },
 		{ 0x0810, 0xe501, "usb gamepad           ", 2, "b", JOYB_B },

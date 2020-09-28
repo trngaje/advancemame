@@ -145,9 +145,9 @@ const char* adv_font_sizex_limit(adv_font* font, const char* begin, const char* 
  * Set a char in the font.
  * The specified bitmap is owned by the font.
  */
-void adv_font_set_char(adv_font* font, char c, adv_bitmap* bitmap)
+void adv_font_set_char(adv_font* font, unsigned short/*char*/ c, adv_bitmap* bitmap)
 {
-	unsigned i = (unsigned char)c;
+	unsigned i = (unsigned short)/*(unsigned char)*/c;
 
 	if (i >= ADV_FONT_MAX)
 		return;
@@ -676,7 +676,10 @@ static adv_font* adv_font_load_freetype2(adv_fz* f, unsigned sizex, unsigned siz
 	sb = (face->size->metrics.ascender + 63) / 64;
 
 	for (i = 0; i < ADV_FONT_MAX; ++i) {
-		e = FT_Load_Char(face, i, FT_LOAD_DEFAULT);
+		if (i < 0x80)
+			e = FT_Load_Char(face, i, FT_LOAD_DEFAULT);
+		else
+			e = FT_Load_Char(face, i-0x80 + 0xac00, FT_LOAD_DEFAULT);
 		if (e == 0) {
 			unsigned x, y;
 			FT_Glyph glyph;
@@ -1051,6 +1054,34 @@ void adv_font_put_char_map(adv_font* font, adv_bitmap* dst, int x, int y, char c
 		}
 		++y;
 	}
+}
+
+void adv_font_put_kor_char_map(adv_font* font, adv_bitmap* dst, int x, int y, unsigned short c, const adv_pixel* map)
+{
+	adv_bitmap* src;
+	unsigned cy;
+	unsigned dp;
+
+	log_std(("[trngaje]adv_font_put_kor_char_map++"));
+	src = font->data[c];
+	if (!src)
+		return;
+
+	dp = dst->bytes_per_pixel;
+
+	for (cy = 0; cy < src->size_y; ++cy) {
+		unsigned char* src_ptr = adv_bitmap_line(src, cy);
+		unsigned char* dst_ptr = adv_bitmap_pixel(dst, x, y);
+		unsigned cx;
+		for (cx = 0; cx < src->size_x; ++cx) {
+			cpu_uint_write(dst_ptr, dp, map[*src_ptr]);
+			dst_ptr += dp;
+			src_ptr += 1;
+		}
+		++y;
+	}
+	
+	log_std(("[trngaje]adv_font_put_kor_char_map--"));
 }
 
 /**
