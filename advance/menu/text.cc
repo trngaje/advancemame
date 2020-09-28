@@ -2665,13 +2665,28 @@ void int_put_kor_alpha(font_t font, int x, int y, unsigned short c, const int_co
 
 void int_put_filled(font_t font, int x, int y, int dx, const string& s, const int_color& color)
 {
+	unsigned short c;
 	for (unsigned i = 0; i < s.length(); ++i) {
-		if (int_put_width(font, s[i]) <= dx) {
-			int_put(font, x, y, s[i], color);
-			x += int_put_width(font, s[i]);
-			dx -= int_put_width(font, s[i]);
-		} else
-			break;
+		c = utf8_to_unicode(s[i], s[i+1], s[i+2]);
+		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+		{
+			if (int_put_kor_width(font, (c-0xac00+0x80) & 0xffff) <= dx) {
+				int_put_kor(font, x, y, (c-0xac00+0x80) & 0xffff, color);
+				x += int_put_kor_width(font, (c-0xac00+0x80) & 0xffff);
+				dx -= int_put_kor_width(font, (c-0xac00+0x80) & 0xffff);
+				i += 2;
+			} else
+				break;			
+		}
+		else
+		{
+			if (int_put_width(font, s[i]) <= dx) {
+				int_put(font, x, y, s[i], color);
+				x += int_put_width(font, s[i]);
+				dx -= int_put_width(font, s[i]);
+			} else
+				break;
+		}
 	}
 	if (dx)
 		int_clear(x, y, dx, int_font_dy_get(font), color.background);
@@ -2692,13 +2707,28 @@ void int_put_filled_center(font_t font, int x, int y, int dx, const string& s, c
 
 void int_put_filled_alpha(font_t font, int x, int y, int dx, const string& s, const int_color& color)
 {
+	unsigned short c;
+	
 	for (unsigned i = 0; i < s.length(); ++i) {
-		if (int_put_width(font, s[i]) <= dx) {
-			int_put_alpha(font, x, y, s[i], color);
-			x += int_put_width(font, s[i]);
-			dx -= int_put_width(font, s[i]);
-		} else
-			break;
+		c = utf8_to_unicode(s[i], s[i+1], s[i+2]);
+		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+		{
+			if (int_put_kor_width(font, (c-0xac00+0x80) & 0xffff) <= dx) {
+				int_put_kor_alpha(font, x, y, (c-0xac00+0x80) & 0xffff, color);
+				x += int_put_kor_width(font, (c-0xac00+0x80) & 0xffff);
+				dx -= int_put_kor_width(font, (c-0xac00+0x80) & 0xffff);
+				i += 2;
+			} else
+				break;			
+		}
+		else{
+			if (int_put_width(font, s[i]) <= dx) {
+				int_put_alpha(font, x, y, s[i], color);
+				x += int_put_width(font, s[i]);
+				dx -= int_put_width(font, s[i]);
+			} else
+				break;
+		}
 	}
 	if (dx)
 		int_clear_alpha(x, y, dx, int_font_dy_get(font), color.background);
@@ -2706,6 +2736,8 @@ void int_put_filled_alpha(font_t font, int x, int y, int dx, const string& s, co
 
 void int_put_special(font_t font, bool& in, int x, int y, int dx, const string& s, const int_color& c0, const int_color& c1, const int_color& c2)
 {
+	unsigned short c;
+	
 	for (unsigned i = 0; i < s.length(); ++i) {
 		if (int_put_width(font, s[i]) <= dx) {
 			if (s[i] == '(' || s[i] == '[')
@@ -2713,7 +2745,14 @@ void int_put_special(font_t font, bool& in, int x, int y, int dx, const string& 
 			if (!in && isupper(s[i])) {
 				int_put(font, x, y, s[i], c0);
 			} else {
-				int_put(font, x, y, s[i], in ? c1 : c2);
+				c = utf8_to_unicode(s[i], s[i+1], s[i+2]);
+				if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+				{
+					int_put_kor(font, x, y, (c-0xac00+0x80) & 0xffff, in ? c1 : c2);
+					i+=2;
+				}
+				else
+					int_put(font, x, y, s[i], in ? c1 : c2);
 			}
 			x += int_put_width(font, s[i]);
 			dx -= int_put_width(font, s[i]);
@@ -2753,11 +2792,8 @@ void int_put_special_alpha(font_t font, bool& in, int x, int y, int dx, const st
 				c = utf8_to_unicode(s[i], s[i+1], s[i+2]);
 				if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
 				{
-					if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
-					{
-						int_put_kor_alpha(font, x, y, (c-0xac00+0x80) & 0xffff, in ? c1 : c2);
-						i+=2;
-					}
+					int_put_kor_alpha(font, x, y, (c-0xac00+0x80) & 0xffff, in ? c1 : c2);
+					i+=2;
 				}
 				else
 					int_put_alpha(font, x, y, s[i], in ? c1 : c2);
@@ -2776,9 +2812,19 @@ void int_put_special_alpha(font_t font, bool& in, int x, int y, int dx, const st
 
 void int_put(font_t font, int x, int y, const string& s, const int_color& color)
 {
+	unsigned short c;
+	
 	for (unsigned i = 0; i < s.length(); ++i) {
-		int_put(font, x, y, s[i], color);
-		x += int_put_width(font, s[i]);
+		c = utf8_to_unicode(s[i], s[i+1], s[i+2]);
+		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+		{
+			int_put_kor(font, x, y, (c-0xac00+0x80) & 0xffff, color);
+			x += int_put_kor_width(font, (c-0xac00+0x80) & 0xffff);
+		}
+		else{
+			int_put(font, x, y, s[i], color);
+			x += int_put_width(font, s[i]);
+		}
 	}
 }
 
@@ -2790,15 +2836,9 @@ void int_put_alpha(font_t font, int x, int y, const string& s, const int_color& 
 		c = utf8_to_unicode(s[i], s[i+1], s[i+2]);
 		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
 		{
-			if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
-			{
-				int_put_kor_alpha(font, x, y, (c-0xac00+0x80) & 0xffff, color);
-				x += int_put_kor_width(font, (c-0xac00+0x80) & 0xffff);	
-				i+=2;
-			}
-			else{
-				x += int_put_width(font, s[i]);				
-			}
+			int_put_kor_alpha(font, x, y, (c-0xac00+0x80) & 0xffff, color);
+			x += int_put_kor_width(font, (c-0xac00+0x80) & 0xffff);	
+			i+=2;
 		}
 		else{
 			int_put_alpha(font, x, y, s[i], color);
@@ -2852,11 +2892,20 @@ unsigned int_put(font_t font, int x, int y, int dx, const string& s, const int_c
 
 unsigned int_put_alpha(font_t font, int x, int y, int dx, const string& s, const int_color& color)
 {
+	unsigned short c;
 	for (unsigned i = 0; i < s.length(); ++i) {
 		int width = int_put_width(font, s[i]);
 		if (width > dx)
 			return i;
-		int_put(font, x, y, s[i], color);
+		
+		c = utf8_to_unicode(s[i], s[i+1], s[i+2]);
+		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+		{
+			int_put_kor(font, x, y, (c-0xac00+0x80) & 0xffff, color);
+			i += 2;
+		}
+		else
+			int_put(font, x, y, s[i], color);
 		x += width;
 		dx -= width;
 	}
