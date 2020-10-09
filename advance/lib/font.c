@@ -110,16 +110,48 @@ unsigned adv_font_sizex_char(adv_font* font, char c)
 		return 0;
 }
 
+unsigned adv_font_sizex_kor_char(adv_font* font, unsigned short c)
+{
+	if (font->data[c])
+		return font->data[c]->size_x;
+	else
+		return 0;
+}
+
+unsigned short utf8_to_unicode2(unsigned char c1, unsigned char c2, unsigned char c3)
+{
+	unsigned short c=0;
+	
+	if ((c1 & 0xf0) == 0xe0)
+		if ((c2 & 0xc0) == 0x80)
+			if ((c3 & 0xc0) == 0x80)
+			{
+				c = ((c1 & 0xf) << 12) | ((c2 & 0x3f) << 6) | (c3 & 0x3f);
+				return c;
+			}
+			
+	return 0;
+}
+
 /**
  * Get the X size of the font.
  * The width of the specified string is used.
  */
 unsigned adv_font_sizex_string(adv_font* font, const char* begin, const char* end)
-{
+{	unsigned short c;
 	unsigned size = 0;
 	while (begin != end) {
-		size += adv_font_sizex_char(font, *begin);
-		++begin;
+		c = utf8_to_unicode2(*begin, *(begin+1), *(begin+2));
+		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+		{
+			size += adv_font_sizex_kor_char(font, (c-0xac00+0x80) & 0xffff);
+			begin+=3;
+		}
+		else
+		{
+			size += adv_font_sizex_char(font, *begin);
+			++begin;
+		}
 	}
 	return size;
 }

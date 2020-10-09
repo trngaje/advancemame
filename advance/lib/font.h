@@ -69,6 +69,8 @@ void adv_font_free(adv_font* font);
 
 unsigned adv_font_sizex(adv_font* font);
 unsigned adv_font_sizex_char(adv_font* font, char c);
+unsigned adv_font_sizex_kor_char(adv_font* font, unsigned short c);
+unsigned short utf8_to_unicode2(unsigned char c1, unsigned char c2, unsigned char c3);
 unsigned adv_font_sizex_string(adv_font* font, const char* begin, const char* end);
 const char* adv_font_sizex_limit(adv_font* font, const char* begin, const char* end, unsigned limit);
 unsigned adv_font_sizey(adv_font* font);

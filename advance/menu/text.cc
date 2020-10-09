@@ -2820,6 +2820,7 @@ void int_put(font_t font, int x, int y, const string& s, const int_color& color)
 		{
 			int_put_kor(font, x, y, (c-0xac00+0x80) & 0xffff, color);
 			x += int_put_kor_width(font, (c-0xac00+0x80) & 0xffff);
+			i+=2;
 		}
 		else{
 			int_put(font, x, y, s[i], color);
@@ -2902,12 +2903,17 @@ unsigned int_put_alpha(font_t font, int x, int y, int dx, const string& s, const
 		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
 		{
 			int_put_kor(font, x, y, (c-0xac00+0x80) & 0xffff, color);
+			width = int_put_kor_width(font, (c-0xac00+0x80) & 0xffff);
+			x += width;
+			dx -= width;
 			i += 2;
 		}
 		else
+		{
 			int_put(font, x, y, s[i], color);
-		x += width;
-		dx -= width;
+			x += width;
+			dx -= width;
+		}
 	}
 	return s.length();
 }
@@ -3429,7 +3435,7 @@ unsigned int_event_get(bool update_background)
 	while (!int_event_waiting()) {
 	}
 
-#if 0 /* OSDEF: Save interface image, only for debugging. */
+#if 1 /* OSDEF: Save interface image, only for debugging. */
 	if (event_peek() == EVENT_INS) {
 		char name[256];
 		static int ssn = 0;
