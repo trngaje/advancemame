@@ -396,6 +396,21 @@ static adv_error joystickb_setup(struct joystick_item_context* item, int f)
 		{ 0x0001, 0x0001, "odroidgo2_joypad", 13, "happy4", JOYB_HAPPY4 },
 		{ 0x0001, 0x0001, "odroidgo2_joypad", 14, "happy5", JOYB_HAPPY5 },
 		{ 0x0001, 0x0001, "odroidgo2_joypad", 15, "happy6", JOYB_HAPPY6 },
+
+		{ 0x484b, 0x1100, "GO-Super Gamepad", 1, "a", JOYB_A },
+		{ 0x484b, 0x1100, "GO-Super Gamepad", 0, "b", JOYB_B },
+		{ 0x484b, 0x1100, "GO-Super Gamepad", 2, "x", JOYB_X },
+		{ 0x484b, 0x1100, "GO-Super Gamepad", 3, "y", JOYB_Y },
+		{ 0x484b, 0x1100, "GO-Super Gamepad", 4, "tl", JOYB_TL },
+		{ 0x484b, 0x1100, "GO-Super Gamepad", 5, "tr", JOYB_TR },
+		{ 0x484b, 0x1100, "GO-Super Gamepad", 6, "tl2", JOYB_TL2 },
+		{ 0x484b, 0x1100, "GO-Super Gamepad", 7, "tr2", JOYB_TR2 },	
+		{ 0x484b, 0x1100, "GO-Super Gamepad", 8, "happy1", JOYB_HAPPY1 },
+		{ 0x484b, 0x1100, "GO-Super Gamepad", 9, "happy2", JOYB_HAPPY2 },		
+		{ 0x484b, 0x1100, "GO-Super Gamepad", 10, "happy1", JOYB_HAPPY3 },
+		{ 0x484b, 0x1100, "GO-Super Gamepad", 11, "happy2", JOYB_HAPPY4 },
+		{ 0x484b, 0x1100, "GO-Super Gamepad", 12, "happy3", JOYB_HAPPY5 },
+		{ 0x484b, 0x1100, "GO-Super Gamepad", 13, "happy4", JOYB_HAPPY6 },
 		
 		/* QMOX SNES */
 		{ 0x0810, 0xe501, "usb gamepad           ", 1, "a", JOYB_A },
