@@ -34,6 +34,8 @@
 
 #include "advance.h"
 
+#include "ui_text.h" // by trngaje
+
 #include <math.h>
 
 /***************************************************************************/
@@ -67,7 +69,8 @@ static int video_mode_menu(struct advance_video_context* context, struct advance
 			crtc = context->state.crtc_map[i];
 	}
 
-	exit_index = advance_ui_menu_text_insert(&menu, "Return to Main Menu");
+	//exit_index = advance_ui_menu_text_insert(&menu, "Return to Main Menu");
+	exit_index = advance_ui_menu_text_insert(&menu, ui_getstring(UI_returntomain));
 
 	mac = advance_ui_menu_done(&menu, ui_context, selected);
 
@@ -176,7 +179,8 @@ static int video_pipeline_menu(struct advance_video_context* context, struct adv
 		}
 	}
 
-	exit_index = advance_ui_menu_text_insert(&menu, "Return to Main Menu");
+	//exit_index = advance_ui_menu_text_insert(&menu, "Return to Main Menu");
+	exit_index = advance_ui_menu_text_insert(&menu, ui_getstring(UI_returntomain));
 
 	mac = advance_ui_menu_done(&menu, ui_context, selected);
 
@@ -470,7 +474,8 @@ int osd2_video_menu(int selected, unsigned input)
 		crash_index = -1;
 	}
 
-	exit_index = advance_ui_menu_text_insert(&menu, "Return to Main Menu");
+	//exit_index = advance_ui_menu_text_insert(&menu, "Return to Main Menu");
+	exit_index = advance_ui_menu_text_insert(&menu, ui_getstring(UI_returntomain));
 
 	mac = advance_ui_menu_done(&menu, ui_context, selected);
 
@@ -739,7 +744,8 @@ static int audio_pipeline_menu(struct advance_sound_context* sound_context, stru
 
 	advance_ui_menu_dft_insert(&menu, sound_context->state.dft_post_X, sound_context->state.dft_padded_size, sound_context->config.eql_cut1, sound_context->config.eql_cut2);
 
-	exit_index = advance_ui_menu_text_insert(&menu, "Return to Main Menu");
+	//exit_index = advance_ui_menu_text_insert(&menu, "Return to Main Menu");
+	exit_index = advance_ui_menu_text_insert(&menu, ui_getstring(UI_returntomain));
 
 	mac = advance_ui_menu_done(&menu, ui_context, selected);
 
@@ -872,7 +878,8 @@ int osd2_audio_menu(int selected, unsigned input)
 		save_game_index = -1;
 	}
 
-	exit_index = advance_ui_menu_text_insert(&menu, "Return to Main Menu");
+	//exit_index = advance_ui_menu_text_insert(&menu, "Return to Main Menu");
+	exit_index = advance_ui_menu_text_insert(&menu, ui_getstring(UI_returntomain));
 
 	mac = advance_ui_menu_done(&menu, ui_context, selected);
 

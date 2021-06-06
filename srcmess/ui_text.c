@@ -203,7 +203,13 @@ static const char *mame_default_text[] =
 	"Video",
 	"Audio",
 	"Autosave Config",
-
+	/* exit */
+	"Select Command",
+	"Continue",
+	"Load",
+	"Save",
+	"Reset",
+	"Exit",
 	NULL
 };
 

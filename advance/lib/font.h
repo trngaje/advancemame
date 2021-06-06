@@ -82,12 +82,14 @@ void adv_font_orientation(adv_font* font, unsigned orientation_mask);
 void adv_font_scale(adv_font* font, unsigned fx, unsigned fy);
 
 void adv_font_put_char(adv_font* font, adv_bitmap* dst, int x, int y, char c, unsigned color_front, unsigned color_back);
+void adv_font_put_kor_char(adv_font* font, adv_bitmap* dst, int x, int y, unsigned short c, unsigned color_front, unsigned color_back);
 void adv_font_put_string(adv_font* font, adv_bitmap* dst, int x, int y, const char* begin, const char* end, unsigned color_front, unsigned color_back);
 void adv_font_put_string_oriented(adv_font* font, adv_bitmap* dst, int x, int y, const char* begin, const char* end, unsigned color_front, unsigned color_back, unsigned orientation);
 void adv_font_put_char_map(adv_font* font, adv_bitmap* dst, int x, int y, char c, const adv_pixel* map);
 void adv_font_put_kor_char_map(adv_font* font, adv_bitmap* dst, int x, int y, unsigned short c, const adv_pixel* map);
 void adv_font_put_string_map(adv_font* font, adv_bitmap* dst, int x, int y, const char* begin, const char* end, const adv_pixel* map);
 void adv_font_put_char_trasp(adv_font* font, adv_bitmap* dst, int x, int y, char c, unsigned color_front);
+void adv_font_put_kor_char_trasp(adv_font* font, adv_bitmap* dst, int x, int y, unsigned short c, unsigned color_front);
 void adv_font_put_string_trasp(adv_font* font, adv_bitmap* dst, int x, int y, const char* begin, const char* end, unsigned color_front);
 
 /*@}*/

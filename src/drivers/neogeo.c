@@ -1416,7 +1416,11 @@ SYSTEM_BIOS_START( neogeo )
 	SYSTEM_BIOS_ADD( 5, "japan",      "Japan MVS (Ver. 3)" )
 	SYSTEM_BIOS_ADD( 6, "japan-s2",   "Japan MVS (Ver. 2)" )
 	SYSTEM_BIOS_ADD( 7, "japan-s1",   "Japan MVS (Ver. 1)" )
-
+	SYSTEM_BIOS_ADD( 8, "uni-bioscd.rom","Unibios MVS (Hack, Ver. 3.3)" )
+	SYSTEM_BIOS_ADD( 9, "uni-bios.rom","Unibios MVS (Hack, Ver. 4.0)" )
+	SYSTEM_BIOS_ADD(10, "debug",      "Debug MVS (Hack?)" )
+	SYSTEM_BIOS_ADD(11, "asia-aes",   "Asia AES" )
+	
 //  SYSTEM_BIOS_ADD( 8, "uni-bios.10","Unibios MVS (Hack, Ver. 1.0)" )
 //  SYSTEM_BIOS_ADD( 9, "uni-bios.11","Unibios MVS (Hack, Ver. 1.1)" )
 //  SYSTEM_BIOS_ADD(10, "debug",      "Debug MVS (Hack?)" )
@@ -1435,6 +1439,10 @@ SYSTEM_BIOS_END
 	ROM_LOAD16_WORD_SWAP_BIOS( 5, "vs-bios.rom",  0x00000, 0x020000, CRC(f0e8f27d) SHA1(ecf01eda815909f1facec62abf3594eaa8d11075) ) /* Japan, Ver 6 VS Bios */ \
 	ROM_LOAD16_WORD_SWAP_BIOS( 6, "sp-j2.rom",    0x00000, 0x020000, CRC(acede59c) SHA1(b6f97acd282fd7e94d9426078a90f059b5e9dd91) ) /* Japan, Older */ \
 	ROM_LOAD16_WORD_SWAP_BIOS( 7, "sp1.jipan.1024",0x00000, 0x020000,  CRC(9fb0abe4) SHA1(18a987ce2229df79a8cf6a84f968f0e42ce4e59d) ) /* Japan, Older */ \
+	ROM_LOAD16_WORD_SWAP_BIOS( 8, "uni-bioscd.rom",  0x00000, 0x080000, CRC(ff3abc59) SHA1(5142f205912869b673a71480c5828b1eaed782a8) ) /* Universe Bios v3.3 (hack) */ \
+	ROM_LOAD16_WORD_SWAP_BIOS( 9, "uni-bios.rom",  0x00000, 0x020000, CRC(a7aab458) SHA1(938a0bda7d9a357240718c2cec319878d36b8f72) ) /* Universe Bios v4.0 (hack) */ \
+	ROM_LOAD16_WORD_SWAP_BIOS(10, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) /* Debug (Development) Bios */ \
+	ROM_LOAD16_WORD_SWAP_BIOS(11, "aes-bios.bin", 0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) /* AES Console (Asia?) Bios */
 
 //  ROM_LOAD16_WORD_SWAP_BIOS( 8, "uni-bios.10",  0x00000, 0x020000, CRC(0ce453a0) SHA1(3b4c0cd26c176fc6b26c3a2f95143dd478f6abf9) ) /* Universe Bios v1.0 (hack) */
 //  ROM_LOAD16_WORD_SWAP_BIOS( 9, "uni-bios.11",  0x00000, 0x020000, CRC(5dda0d84) SHA1(4153d533c02926a2577e49c32657214781ff29b7) ) /* Universe Bios v1.1 (hack) */

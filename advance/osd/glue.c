@@ -2598,28 +2598,34 @@ static int on_exit_menu(int selected)
 	sel = selected;
 
 	total = 0;
-
-	exit_menu[total].text = "Continue";
+/*
+	UI_exit_continue,
+	UI_exit_load,
+	UI_exit_save,
+	UI_exit_reset,
+	UI_exit_exit,
+*/
+	exit_menu[total].text = ui_getstring(UI_exit_continue)/*"Continue"*/;
 	exit_menu[total].subtext = 0;
 	exit_menu[total].flags = 0;
 	++total;
 
-	exit_menu[total].text = "Load";
+	exit_menu[total].text = ui_getstring(UI_exit_load)/*"Load"*/;
 	exit_menu[total].subtext = 0;
 	exit_menu[total].flags = 0;
 	++total;
 
-	exit_menu[total].text = "Save";
+	exit_menu[total].text = ui_getstring(UI_exit_save)/*"Save"*/;
 	exit_menu[total].subtext = 0;
 	exit_menu[total].flags = 0;
 	++total;
 
-	exit_menu[total].text = "Reset";
+	exit_menu[total].text = ui_getstring(UI_exit_reset)/*"Reset"*/;
 	exit_menu[total].subtext = 0;
 	exit_menu[total].flags = 0;
 	++total;
 
-	exit_menu[total].text = "Exit";
+	exit_menu[total].text = ui_getstring(UI_exit_exit)/*"Exit"*/;
 	exit_menu[total].subtext = 0;
 	exit_menu[total].flags = 0;
 	++total;

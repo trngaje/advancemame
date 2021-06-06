@@ -371,6 +371,8 @@ static adv_bool ui_recognize_title(const char* begin, const char* end)
 	return 0;
 }
 
+extern unsigned short utf8_to_unicode2(unsigned char c1, unsigned char c2, unsigned char c3);
+
 static void ui_scroll(struct advance_ui_context* context, adv_bitmap* dst, char* begin, char* end, unsigned pos, struct ui_color text_f, struct ui_color text_b, adv_pixel* text_map, struct ui_color title_f, struct ui_color title_b, adv_pixel* title_map, adv_color_def def)
 {
 	unsigned size_r;
@@ -392,12 +394,30 @@ static void ui_scroll(struct advance_ui_context* context, adv_bitmap* dst, char*
 	border_y = step_y / 2;
 
 	/* remove unprintable chars */
+#if 1
+    /* 한글 코드는 제거하면 안됨 */
+	unsigned short c;
+	i = begin;
+	while (i != end) {
+		c = utf8_to_unicode2(*i, *(i+1), *(i+2));
+		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+		{	
+			i+=3;
+		}
+		else{
+			if (!((*i >= ' ' && *i <= '~') || *i == '\n'))
+				*i = ' ';
+			++i;
+		}
+	}	
+#else
 	i = begin;
 	while (i != end) {
 		if (!((*i >= ' ' && *i <= '~') || *i == '\n'))
 			*i = ' ';
 		++i;
 	}
+#endif
 
 	/* count size_r and compute width and wrap long line */
 	limit_x = dst->size_x - 6 * border_x;
@@ -1596,7 +1616,7 @@ void osd_ui_menu(const ui_menu_item *items, int numitems, int selected)
 	advance_ui_menu_init(&menu);
 
 	/* HACK: Recognize main menu */
-	if (items && strstr(items[0].text, "Input") != 0) {
+	if (items && (strcmp(items[0].text, ui_getstring(UI_inputgeneral))==0)/*strstr(items[0].text, "Input")*/ != 0) {
 		char buf[128];
 
 		snprintf(buf, sizeof(buf), "%s %s", ADV_TITLE, ADV_VERSION);
@@ -1605,11 +1625,11 @@ void osd_ui_menu(const ui_menu_item *items, int numitems, int selected)
 	}
 
 	/* HACK: Recognize exit menu */
-	if (items && strstr(items[0].text, "Continue") != 0) {
+	if (items && (strcmp(items[0].text, ui_getstring(UI_exit_continue))==0)/*strstr(items[0].text, "Continue")*/ != 0) {
 		char buf[128];
 
-		snprintf(buf, sizeof(buf), "Select Command");
-
+		snprintf(buf, sizeof(buf), ui_getstring(UI_exit_select_command)/*"Select Command"*/); //trngaje
+		
 		advance_ui_menu_title_insert(&menu, buf);
 	}
 

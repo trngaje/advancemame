@@ -198,6 +198,14 @@ enum
 	UI_osd_2, /* Audio */
 	UI_osd_3, /* Autosave Config */
 
+	/* exit */
+	UI_exit_select_command,
+	UI_exit_continue,
+	UI_exit_load,
+	UI_exit_save,
+	UI_exit_reset,
+	UI_exit_exit,
+
 	UI_last_mame_entry
 };
 

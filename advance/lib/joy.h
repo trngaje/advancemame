@@ -83,6 +83,11 @@ extern "C" {
 #define JOYB_HAPPY5 150
 #define JOYB_HAPPY6 151
 
+#define JOYB_NORTH 152
+#define JOYB_EAST 153
+#define JOYB_SOUTH 154
+#define JOYB_WEST 155
+
 #define JOYB_MAX 256
 /*@}*/
 

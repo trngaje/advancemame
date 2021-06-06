@@ -53,6 +53,11 @@ static struct joy_entry JOY_BUTTON[] = {
 	{ "happy4", JOYB_HAPPY4 },
 	{ "happy5", JOYB_HAPPY5 },
 	{ "happy6", JOYB_HAPPY6 },
+	
+	{ "north", JOYB_NORTH },
+	{ "east", JOYB_EAST },
+	{ "south", JOYB_SOUTH },
+	{ "west", JOYB_WEST },
 	{ 0, 0 }
 };
 

@@ -161,10 +161,21 @@ unsigned adv_font_sizex_string(adv_font* font, const char* begin, const char* en
  */
 const char* adv_font_sizex_limit(adv_font* font, const char* begin, const char* end, unsigned limit)
 {
+	unsigned short c;
 	unsigned size = 0;
 
 	while (begin != end) {
-		size += adv_font_sizex_char(font, *begin);
+		c = utf8_to_unicode2(*begin, *(begin+1), *(begin+2));
+		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+		{
+			size += adv_font_sizex_kor_char(font, (c-0xac00+0x80) & 0xffff);
+			begin+=2;
+		}
+		else
+		{
+			size += adv_font_sizex_char(font, *begin);
+		}			
+
 		if (size > limit)
 			return begin;
 		++begin;
@@ -999,6 +1010,36 @@ void adv_font_put_char(adv_font* font, adv_bitmap* dst, int x, int y, char c, un
 	}
 }
 
+void adv_font_put_kor_char(adv_font* font, adv_bitmap* dst, int x, int y, unsigned short c, unsigned color_front, unsigned color_back)
+{
+	adv_bitmap* src;
+	unsigned cy;
+
+	src = font->data[c];
+	if (!src) {
+		return;
+	}
+
+	for (cy = 0; cy < src->size_y; ++cy) {
+		unsigned char* src_ptr = adv_bitmap_line(src, cy);
+		unsigned char* dst_ptr = adv_bitmap_pixel(dst, x, y);
+		unsigned dp = dst->bytes_per_pixel;
+		unsigned cx;
+		for (cx = 0; cx < src->size_x; ++cx) {
+			unsigned v;
+			if (*src_ptr >= 64) {
+				v = color_front;
+			} else {
+				v = color_back;
+			}
+			cpu_uint_write(dst_ptr, dp, v);
+			dst_ptr += dp;
+			src_ptr += 1;
+		}
+		++y;
+	}
+}
+
 /**
  * Draw a string in a bitmap.
  * \param font Font to use.
@@ -1010,9 +1051,22 @@ void adv_font_put_char(adv_font* font, adv_bitmap* dst, int x, int y, char c, un
  */
 void adv_font_put_string(adv_font* font, adv_bitmap* dst, int x, int y, const char* begin, const char* end, unsigned color_front, unsigned color_back)
 {
+	unsigned short c;
+	
 	while (begin != end) {
-		adv_font_put_char(font, dst, x, y, *begin, color_front, color_back);
+		c = utf8_to_unicode2(begin[0], begin[1], begin[2]);
+		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+		{
+			adv_font_put_kor_char(font, dst, x, y, (c-0xac00+0x80) & 0xffff, color_front, color_back);
+			++begin;
+			++begin;
+		}
+		else
+		{
+			adv_font_put_char(font, dst, x, y, *begin, color_front, color_back);
+		}
 		x += adv_font_sizex_char(font, *begin);
+			
 		++begin;
 	}
 }
@@ -1023,6 +1077,9 @@ void adv_font_put_string(adv_font* font, adv_bitmap* dst, int x, int y, const ch
  */
 void adv_font_put_string_oriented(adv_font* font, adv_bitmap* dst, int x, int y, const char* begin, const char* end, unsigned color_front, unsigned color_back, unsigned orientation)
 {
+	// osd_ui.c ¿¡¼­ È£ÃâµÊ, trngaje
+	unsigned short c;
+	
 	if ((orientation & ADV_ORIENTATION_FLIP_XY) != 0) {
 		if ((orientation & ADV_ORIENTATION_FLIP_X) != 0)
 			x -= adv_font_sizex_char(font, *begin) - 1;
@@ -1039,7 +1096,19 @@ void adv_font_put_string_oriented(adv_font* font, adv_bitmap* dst, int x, int y,
 			if ((orientation & ADV_ORIENTATION_FLIP_X) != 0)
 				x -= adv_font_sizex_char(font, *begin) - 1;
 		}
-		adv_font_put_char(font, dst, x, y, *begin, color_front, color_back);
+		
+		c = utf8_to_unicode2(begin[0], begin[1], begin[2]);
+		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+		{
+			adv_font_put_kor_char(font, dst, x, y, (c-0xac00+0x80) & 0xffff, color_front, color_back);
+			++begin;
+			++begin;
+		}
+		else
+		{
+			adv_font_put_char(font, dst, x, y, *begin, color_front, color_back);
+		}
+		
 		if ((orientation & ADV_ORIENTATION_FLIP_XY) != 0) {
 			if ((orientation & ADV_ORIENTATION_FLIP_Y) != 0)
 				y -= 1;
@@ -1126,8 +1195,19 @@ void adv_font_put_kor_char_map(adv_font* font, adv_bitmap* dst, int x, int y, un
  */
 void adv_font_put_string_map(adv_font* font, adv_bitmap* dst, int x, int y, const char* begin, const char* end, const adv_pixel* map)
 {
+	unsigned short c;
+	
 	while (begin != end) {
-		adv_font_put_char_map(font, dst, x, y, *begin, map);
+		c = utf8_to_unicode2(begin[0], begin[1], begin[2]);
+		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+		{
+			adv_font_put_kor_char_map(font, dst, x, y, (c-0xac00+0x80) & 0xffff, map);
+			++begin;
+			++begin;
+		}
+		else{
+			adv_font_put_char_map(font, dst, x, y, *begin, map);
+		}
 		x += adv_font_sizex_char(font, *begin);
 		++begin;
 	}
@@ -1168,6 +1248,33 @@ void adv_font_put_char_trasp(adv_font* font, adv_bitmap* dst, int x, int y, char
 	}
 }
 
+void adv_font_put_kor_char_trasp(adv_font* font, adv_bitmap* dst, int x, int y, unsigned short c, unsigned color_front)
+{
+	adv_bitmap* src;
+	unsigned cy;
+	unsigned dp;
+
+	src = font->data[c];
+	if (!src)
+		return;
+
+	dp = dst->bytes_per_pixel;
+
+	for (cy = 0; cy < src->size_y; ++cy) {
+		unsigned char* src_ptr = adv_bitmap_line(src, cy);
+		unsigned char* dst_ptr = adv_bitmap_pixel(dst, x, y);
+		unsigned cx;
+		for (cx = 0; cx < src->size_x; ++cx) {
+			if (*src_ptr >= 64) {
+				cpu_uint_write(dst_ptr, dp, color_front);
+			}
+			dst_ptr += dp;
+			src_ptr += 1;
+		}
+		++y;
+	}
+}
+
 /**
  * Draw a transparent string in a bitmap.
  * \param font Font to use.
@@ -1178,8 +1285,19 @@ void adv_font_put_char_trasp(adv_font* font, adv_bitmap* dst, int x, int y, char
  */
 void adv_font_put_string_trasp(adv_font* font, adv_bitmap* dst, int x, int y, const char* begin, const char* end, unsigned color_front)
 {
+	unsigned short c;
+	
 	while (begin != end) {
-		adv_font_put_char_trasp(font, dst, x, y, *begin, color_front);
+		c = utf8_to_unicode2(begin[0], begin[1], begin[2]);
+		if (c >= 0xac00 && c <= 0xd7a3) // unicode hangul code range
+		{
+			adv_font_put_kor_char_trasp(font, dst, x, y, (c-0xac00+0x80) & 0xffff, color_front);
+			++begin;
+			++begin;
+		}
+		else{
+			adv_font_put_char_trasp(font, dst, x, y, *begin, color_front);
+		}
 		x += adv_font_sizex_char(font, *begin);
 		++begin;
 	}

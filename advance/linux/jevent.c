@@ -371,6 +371,23 @@ static adv_error joystickb_setup(struct joystick_item_context* item, int f)
 #ifdef BTN_FORWARD
 		{ BTN_FORWARD, "forward" }, /* ball */
 #endif
+
+#ifdef BTN_SOUTH
+		{ BTN_SOUTH, "south" }, 
+#endif
+
+#ifdef BTN_EAST
+		{ BTN_EAST, "east" }, 
+#endif
+
+#ifdef BTN_NORTH
+		{ BTN_NORTH, "north" }, 
+#endif
+
+#ifdef BTN_WEST
+		{ BTN_WEST, "west" }, 
+#endif
+
 #ifdef BTN_BACK
 		{ BTN_BACK, "back" } /* ball */
 #endif
@@ -396,6 +413,20 @@ static adv_error joystickb_setup(struct joystick_item_context* item, int f)
 		{ 0x0001, 0x0001, "odroidgo2_joypad", 13, "happy4", JOYB_HAPPY4 },
 		{ 0x0001, 0x0001, "odroidgo2_joypad", 14, "happy5", JOYB_HAPPY5 },
 		{ 0x0001, 0x0001, "odroidgo2_joypad", 15, "happy6", JOYB_HAPPY6 },
+
+		/* OGA cloned RG351P */
+		{ 0x1209, 0x3100, "OpenSimHardware OSH PB Controller", 9, "south", JOYB_SOUTH },
+		{ 0x1209, 0x3100, "OpenSimHardware OSH PB Controller", 10, "east", JOYB_EAST },
+		{ 0x1209, 0x3100, "OpenSimHardware OSH PB Controller", 11, "c", JOYB_C },
+		{ 0x1209, 0x3100, "OpenSimHardware OSH PB Controller", 12, "north", JOYB_NORTH },
+		{ 0x1209, 0x3100, "OpenSimHardware OSH PB Controller", 13, "west", JOYB_WEST },
+		{ 0x1209, 0x3100, "OpenSimHardware OSH PB Controller", 14, "z", JOYB_Z },
+		{ 0x1209, 0x3100, "OpenSimHardware OSH PB Controller", 15, "tl", JOYB_TL },
+		{ 0x1209, 0x3100, "OpenSimHardware OSH PB Controller", 16, "tr", JOYB_TR },
+		{ 0x1209, 0x3100, "OpenSimHardware OSH PB Controller", 17, "tl2", JOYB_TL2 },
+		{ 0x1209, 0x3100, "OpenSimHardware OSH PB Controller", 18, "tr2", JOYB_TR2 },
+		{ 0x1209, 0x3100, "OpenSimHardware OSH PB Controller", 19, "select", JOYB_SELECT },
+		{ 0x1209, 0x3100, "OpenSimHardware OSH PB Controller", 20, "start", JOYB_START },		
 
 		{ 0x484b, 0x1100, "GO-Super Gamepad", 1, "a", JOYB_A },
 		{ 0x484b, 0x1100, "GO-Super Gamepad", 0, "b", JOYB_B },
