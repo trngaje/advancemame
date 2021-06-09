@@ -264,7 +264,14 @@ enum
 	UI_low_freq,
 	UI_mid_freq,
 	UI_high_freq,
-
+	UI_warning_save_states_are_not_officially_supported_for_this_game, 
+	UI_state_successfully_saved, 
+	UI_error_failed_to_save_state,
+	UI_state_successfully_loaded,
+	UI_error_failed_to_load_state,
+	UI_unable_to_load_due_to_pending_anonymous_timers, 
+	UI_error_unable_to_save_state_due_to_illegal_registrations, 
+	UI_unable_to_save_due_to_pending_anonymous_timers, 
 	UI_last_mame_entry
 };
 

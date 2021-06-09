@@ -269,6 +269,14 @@ static const char *mame_default_text[] =
 	"Low Freq (dB)",
 	"Mid Freq (dB)",
 	"High Freq (dB)",
+	"Warning: Save states are not officially supported for this game.",
+	"State successfully saved.",
+	"Error: Failed to save state",
+	"State successfully loaded.",
+	"Error: Failed to load state",
+	"Unable to load due to pending anonymous timers. See error.log for details.",
+	"Error: Unable to save state due to illegal registrations. See error.log for details.",
+	"Unable to save due to pending anonymous timers. See error.log for details.",
 	
 	NULL
 };

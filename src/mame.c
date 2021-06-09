@@ -79,6 +79,8 @@
 #include "debugger.h"
 #include "profiler.h"
 
+#include "ui_text.h" // added by trngaje
+
 #if defined(MAME_DEBUG) && defined(NEW_DEBUGGER)
 #include "debug/debugcon.h"
 #endif
@@ -1267,7 +1269,7 @@ static void handle_save(void)
 		/* if more than a second has passed, we're probably screwed */
 		if (sub_mame_times(mame_timer_get_time(), saveload_schedule_time).seconds > 0)
 		{
-			ui_popup("Unable to save due to pending anonymous timers. See error.log for details.");
+			ui_popup(ui_getstring(UI_unable_to_save_due_to_pending_anonymous_timers)/*"Unable to save due to pending anonymous timers. See error.log for details."*/);
 			goto cancel;
 		}
 		return;
@@ -1282,7 +1284,7 @@ static void handle_save(void)
 		/* write the save state */
 		if (state_save_save_begin(file) != 0)
 		{
-			ui_popup("Error: Unable to save state due to illegal registrations. See error.log for details.");
+			ui_popup(ui_getstring(UI_error_unable_to_save_state_due_to_illegal_registrations)/*"Error: Unable to save state due to illegal registrations. See error.log for details."*/);
 			mame_fclose(file);
 			goto cancel;
 		}
@@ -1314,12 +1316,16 @@ static void handle_save(void)
 
 		/* pop a warning if the game doesn't support saves */
 		if (!(Machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
-			ui_popup("State successfully saved.\nWarning: Save states are not officially supported for this game.");
+		{
+			char strmsg_state_successfully_saved_long[256];
+			sprintf(strmsg_state_successfully_saved_long, "%s\n%s", ui_getstring(UI_state_successfully_saved), ui_getstring(UI_warning_save_states_are_not_officially_supported_for_this_game)); 
+			ui_popup(strmsg_state_successfully_saved_long/*"State successfully saved.\nWarning: Save states are not officially supported for this game."*/);
+		}
 		else
-			ui_popup("State successfully saved.");
+			ui_popup(ui_getstring(UI_state_successfully_saved)/*"State successfully saved."*/);
 	}
 	else
-		ui_popup("Error: Failed to save state");
+		ui_popup(ui_getstring(UI_error_failed_to_save_state)/*"Error: Failed to save state"*/);
 
 cancel:
 	/* unschedule the save */
@@ -1351,7 +1357,7 @@ static void handle_load(void)
 		/* if more than a second has passed, we're probably screwed */
 		if (sub_mame_times(mame_timer_get_time(), saveload_schedule_time).seconds > 0)
 		{
-			ui_popup("Unable to load due to pending anonymous timers. See error.log for details.");
+			ui_popup(ui_getstring(UI_unable_to_load_due_to_pending_anonymous_timers)/*"Unable to load due to pending anonymous timers. See error.log for details."*/);
 			goto cancel;
 		}
 		return;
@@ -1392,14 +1398,14 @@ static void handle_load(void)
 
 			/* finish and close */
 			state_save_load_finish();
-			ui_popup("State successfully loaded.");
+			ui_popup(ui_getstring(UI_state_successfully_loaded)/*"State successfully loaded."*/);
 		}
 		else
-			ui_popup("Error: Failed to load state");
+			ui_popup(ui_getstring(UI_error_failed_to_load_state)/*"Error: Failed to load state"*/);
 		mame_fclose(file);
 	}
 	else
-		ui_popup("Error: Failed to load state");
+		ui_popup(ui_getstring(UI_error_failed_to_load_state)/*"Error: Failed to load state"*/);
 
 cancel:
 	/* unschedule the load */
