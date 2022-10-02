@@ -981,7 +981,9 @@ static void update_digital_joysticks(void);
 static void update_analog_port(int port);
 static void interpolate_analog_port(int port);
 
-
+#if 1
+static UINT8  autopressed[MAX_BITS_PER_PORT];
+#endif
 
 /*************************************
  *
@@ -2232,7 +2234,20 @@ profiler_mark(PROFILER_INPUT);
 				{
 					/* if the sequence for this port is currently pressed.... */
 					int pressed = seq_pressed(input_port_seq(port, SEQ_TYPE_STANDARD));
-
+					// trngaje
+					if (pressed) {
+						if (port->autofire) {
+							extern UINT32		autofiredelay;
+							if (autopressed[bitnum] >= autofiredelay)
+							{
+								pressed = 0;
+								autopressed[bitnum] = 0;
+							}
+							else
+								autopressed[bitnum]++;							
+						}
+					}
+					
 					/* AdvanceMAME: Filter all the input ports */
 					pressed = osd_input_port_filter(pressed, port->type, port->player, SEQ_TYPE_STANDARD);
 

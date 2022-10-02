@@ -277,7 +277,8 @@ static const char *mame_default_text[] =
 	"Unable to load due to pending anonymous timers. See error.log for details.",
 	"Error: Unable to save state due to illegal registrations. See error.log for details.",
 	"Unable to save due to pending anonymous timers. See error.log for details.",
-	
+	"Set Autofire",			
+	"Autofire delay",	
 	NULL
 };
 

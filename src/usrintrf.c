@@ -372,6 +372,7 @@ static void render_ui(mame_bitmap *dest);
 /* -- end this stuff will go away with the new rendering system */
 
 
+static UINT32 menu_set_autofire(UINT32 state);
 
 /*************************************
  *
@@ -1521,6 +1522,9 @@ do { \
 	if (osd_has_save_config())
 		ADD_MENU(UI_osd_3, menu_osd_3, 0);
 
+	/* autofire by trngaje */
+	ADD_MENU(UI_autofire, menu_set_autofire, 0);
+
 	/* add reset and exit menus */
 	ADD_MENU(UI_resetgame, menu_reset_game, 0);
 	ADD_MENU(UI_returntogame, NULL, 0);
@@ -1812,6 +1816,155 @@ static int compare_game_inputs(const void *i1, const void *i2)
 	return (data1->sortorder < data2->sortorder) ? -1 : (data1->sortorder > data2->sortorder) ? 1 : 0;
 }
 
+
+UINT32		autofiredelay=10;
+// add by trngaje
+static UINT32 menu_set_autofire(UINT32 state)
+{
+	int selected = state & 0x3fff;
+	input_port_entry *entry[400];
+	input_port_entry *in;
+	char delay[100];
+	int sel;
+	int total;
+	int autofire_delay;
+	int value = 0;
+	int changed = 0;
+	int type;
+	int v;
+	
+	ui_menu_item item_list[20];
+	memset(item_list, 0, sizeof(item_list));	
+
+	sel = selected - 1;
+
+	if (sel < 0) sel = 0;
+
+	total = 0;
+
+	if (Machine->input_ports)
+	{
+		in = Machine->input_ports;
+
+		for (in = Machine->input_ports; in->type != IPT_END; in++)
+		{
+			type = in->type;
+
+			//printf("[trngaje] %s, %d\n", input_port_name(in), type);
+			if (input_port_name(in)	&& (
+			    (type >= IPT_BUTTON1 && type < IPT_BUTTON1 + 10)
+
+			   ))
+			{
+
+				//printf("[trngaje] %s, IPT_BUTTON\n", input_port_name(in));
+				entry[total] = in;
+
+				v = (in->autofire); // & IPF_AUTOFIRE_MASK) >> IPF_AUTOFIRE_SHIFT;
+
+				item_list[total].text = input_port_name(in);
+
+				if (in->autofire/* & IPF_AUTOFIRE_MASK*/)
+					item_list[total].subtext = ui_getstring(UI_on);
+				else 
+					item_list[total].subtext = ui_getstring(UI_off);
+
+				if (total == sel)
+					value = v;
+				total++;
+
+			}
+		}
+	}
+
+	if (total == 0) {
+		return 0;
+	}
+
+	
+	autofiredelay = get_autofire_delay();
+	sprintf(delay, "%d", autofiredelay);
+	autofire_delay = total;
+
+	item_list[total].text = ui_getstring (UI_autofiredelay);
+	item_list[total].subtext = delay;
+	total++;
+
+
+	item_list[total++].text = ui_getstring (UI_returntomain);
+
+
+	ui_draw_menu(item_list, total, sel);
+
+	
+	if (sel == autofire_delay)
+	{
+		if (input_ui_pressed_repeat(IPT_UI_RIGHT,8))
+		{
+			autofiredelay++;
+			if (autofiredelay > 99)
+				autofiredelay = 99;
+			changed = 1;
+			set_autofire_delay(autofiredelay);
+		}
+		if (input_ui_pressed_repeat(IPT_UI_LEFT,8))
+		{
+			autofiredelay--;
+			if (autofiredelay < 1)
+				autofiredelay = 1;
+			changed = 1;
+			set_autofire_delay(autofiredelay);
+		}
+	}
+	else if (sel < autofire_delay) /* autofire button toggle */
+	{
+		UINT32 type = entry[sel]->autofire; // & ~IPF_AUTOFIRE_MASK;
+		if (input_ui_pressed_repeat(IPT_UI_RIGHT,8))
+		{
+			if (value) value = 0;
+			else value = 1;
+			changed = 1;
+		}
+		if (input_ui_pressed_repeat(IPT_UI_LEFT,8))
+		{
+			if (value) value = 0;
+			else value = 1;
+			changed = 1;
+		}
+		entry[sel]->autofire = value;
+	}
+
+    // 아래 조건으로 커서 이동은 가능함
+	
+	if (input_ui_pressed_repeat(IPT_UI_DOWN,8))
+		sel = (sel + 1) % total;
+
+	if (input_ui_pressed_repeat(IPT_UI_UP,8))
+		sel = (sel + total - 1) % total;
+
+
+
+	if (input_ui_pressed(IPT_UI_SELECT))
+	{
+		if (sel == total - 1) return ui_menu_stack_pop();
+		//else sel = 0;
+	}
+
+	if (input_ui_pressed(IPT_UI_CANCEL))
+ 		return ui_menu_stack_pop(); // 이전 메뉴로 돌아갈려면 이 함수 호출해야 함
+
+	// 아래 코드가 없어도 키 입력 시 hide 됨
+	//if (input_ui_pressed(IPT_UI_CONFIGURE)) // 이건 수행되지 않음
+	//	return ui_menu_stack_pop();
+
+	if (/*sel == -1 || sel == -2 ||*/ changed)
+		schedule_full_refresh();
+
+	return sel + 1; 
+	/* return 0 : nothing    */
+	/* return -1 : hide menu */
+	
+}
 
 static UINT32 menu_game_input(UINT32 state)
 {

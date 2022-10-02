@@ -2289,6 +2289,8 @@ adv_error advance_input_init(struct advance_input_context* context, adv_conf* cf
 	conf_bool_register_default(cfg_context, "input_steadykey", 0);
 	conf_int_register_default(cfg_context, "input_idleexit", 0);
 
+	conf_int_register_default(cfg_context, "autofire_delay", 10); /* auto fire by trngaje */
+	
 	/* analog */
 	for (i = 0; i < INPUT_PLAYER_MAX; ++i) {
 		unsigned j;
@@ -2509,6 +2511,8 @@ adv_error advance_input_config_load(struct advance_input_context* context, adv_c
 	context->config.steadykey_flag = conf_bool_get_default(cfg_context, "input_steadykey");
 	context->config.input_idle_limit = conf_int_get_default(cfg_context, "input_idleexit");
 
+	context->config.autofire_delay = conf_int_get_default(cfg_context, "autofire_delay"); /* auto fire */
+	
 	if (joystickb_load(cfg_context) != 0) {
 		return -1;
 	}
@@ -2753,6 +2757,26 @@ static int advance_input_analog_read(struct advance_input_context* context, unsi
 	*value = 0;
 	return ANALOG_TYPE_NONE;
 }
+
+#if 1
+	
+int get_autofire_delay(void)
+{
+	struct advance_input_context* context = &CONTEXT.input;
+	return context->config.autofire_delay;
+}
+	
+void set_autofire_delay(int delay)
+{
+	struct advance_input_context* context = &CONTEXT.input;
+	context->config.autofire_delay = delay;
+	
+	adv_conf* cfg_context = CONTEXT.cfg;
+	conf_int_set_if_different(cfg_context, "", "autofire_delay", context->config.autofire_delay);
+}
+
+#endif
+
 
 /***************************************************************************/
 /* OSD interface */

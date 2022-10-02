@@ -193,6 +193,7 @@ struct analog_map_entry {
 
 struct advance_input_config_context {
 	int input_idle_limit; /**< Limit of no input to exit. */
+	int autofire_delay; /* auto fire by trngaje */
 	adv_bool steadykey_flag; /**< Enable the steady-key management. */
 	adv_bool disable_special_flag; /**< Disable the special OS key sequences. */
 	struct analog_map_entry analog_map[INPUT_PLAYER_MAX][INPUT_ANALOG_MAX]; /**< Mapping of the analog controls. */
@@ -1061,6 +1062,9 @@ static inline double advance_timer(void)
 {
 	return target_clock() / (double)TARGET_CLOCKS_PER_SEC;
 }
+
+int get_autofire_delay(void);
+void set_autofire_delay(int delay);
 
 #endif
 

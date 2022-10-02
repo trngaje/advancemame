@@ -239,6 +239,8 @@ struct _global_options
 	int		min_height;		/* minimum height for the display */
 	int		ui_flag; /* AdvanceMAME: UI enabled at startup */
 #endif /* MESS */
+
+	UINT32		autofiredelay;
 };
 
 

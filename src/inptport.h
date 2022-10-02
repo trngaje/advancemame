@@ -424,6 +424,7 @@ struct _input_port_entry
 	UINT32		default_value;	/* default value for the bits affected */
 								/* you can also use one of the IP_ACTIVE defines above */
 	UINT32		type;			/* see enum above */
+	UINT8		autofire;		/* autofire by trngaje */
 	UINT8		unused;			/* The bit is not used by this game, but is used */
 								/* by other games running on the same hardware. */
 								/* This is different from IPT_UNUSED, which marks */

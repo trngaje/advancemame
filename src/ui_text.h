@@ -272,6 +272,11 @@ enum
 	UI_unable_to_load_due_to_pending_anonymous_timers, 
 	UI_error_unable_to_save_state_due_to_illegal_registrations, 
 	UI_unable_to_save_due_to_pending_anonymous_timers, 
+
+#if 1	
+	UI_autofire,	
+	UI_autofiredelay,	
+#endif	
 	UI_last_mame_entry
 };
 
