@@ -30,6 +30,8 @@
 
 #include <iostream>
 
+#include <SDL.h>
+
 using namespace std;
 
 // --------------------------------------------------------------------------
@@ -396,6 +398,9 @@ int run_all(adv_conf* config_context, config_state& rs)
 				// save before
 				rs.save(config_context);
 
+#if SDL_MAJOR_VERSION == 1
+				os_inner_done();
+#endif
 				// run the game
 				if (rs.current_game->software_get()) {
 					const game* bios;
@@ -416,6 +421,12 @@ int run_all(adv_conf* config_context, config_state& rs)
 
 				// print the messages
 				target_flush();
+				
+
+#if SDL_MAJOR_VERSION == 1
+//				done = true; // to terminate advmenu after run emulator
+				os_inner_init("AdvanceMENU");
+#endif
 			}
 			break;
 		}
