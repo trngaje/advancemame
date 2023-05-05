@@ -765,6 +765,7 @@ $(OBJ)/kaneko.a: \
 	$(OBJ)/drivers/galpani2.o $(OBJ)/vidhrdw/galpani2.o \
 	$(OBJ)/drivers/galpani3.o \
 	$(OBJ)/drivers/jchan.o \
+	$(OBJ)/drivers/hvyunit.o \
 	$(OBJ)/drivers/kaneko16.o $(OBJ)/machine/kaneko16.o $(OBJ)/vidhrdw/kaneko16.o \
 	$(OBJ)/drivers/suprnova.o $(OBJ)/vidhrdw/suprnova.o \
 
@@ -1197,6 +1198,7 @@ $(OBJ)/tad.a: \
 	$(OBJ)/drivers/cabal.o $(OBJ)/vidhrdw/cabal.o \
 	$(OBJ)/drivers/goal92.o $(OBJ)/vidhrdw/goal92.o \
 	$(OBJ)/drivers/legionna.o $(OBJ)/vidhrdw/legionna.o \
+	$(OBJ)/drivers/denjinmk.o $(OBJ)/machine/seicop.o $(OBJ)/vidhrdw/denjinmk.o \
 	$(OBJ)/drivers/toki.o $(OBJ)/vidhrdw/toki.o \
 
 $(OBJ)/taito.a: \
