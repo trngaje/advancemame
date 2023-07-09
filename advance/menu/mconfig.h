@@ -454,6 +454,14 @@ public:
 	std::string script_error;
 	script_container script_bag;
 
+	// add extra config
+	std::string ui_ip;
+	std::string ui_battery;
+	std::string ui_runcommand_cfg;
+	std::string languagefile_path;
+	
+	bool ui_menu_kor;
+	
 	config_state();
 	~config_state();
 

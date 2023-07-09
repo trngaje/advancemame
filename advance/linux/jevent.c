@@ -172,157 +172,17 @@ static adv_error joystickb_setup(struct joystick_item_context* item, int f)
 	int override_begin;
 	int override_end;
 
+	/* temp var by trngaje */
+	int index_a = -1, index_b = -1;
+	const char *name_a = NULL, *name_b = NULL;
+	int bind_a = -1, bind_b = -1;
+			
 	struct button_entry {
 		int code;
 		const char* name;
 		int bind;
 	} button_map[] = {
-#ifdef BTN_TRIGGER
-		{ BTN_TRIGGER, "trigger" }, /* joystick */
-#endif
-#ifdef BTN_THUMB
-		{ BTN_THUMB, "thumb" }, /* joystick */
-#endif
-#ifdef BTN_THUMB2
-		{ BTN_THUMB2, "thumb2" }, /* joystick */
-#endif
-#ifdef BTN_TOP
-		{ BTN_TOP, "top" }, /* joystick */
-#endif
-#ifdef BTN_TOP2
-		{ BTN_TOP2, "top2" }, /* joystick */
-#endif
-#ifdef BTN_PINKIE
-		{ BTN_PINKIE, "pinkie" }, /* joystick */
-#endif
-#ifdef BTN_BASE
-		{ BTN_BASE, "base" }, /* joystick */
-#endif
-#ifdef BTN_BASE2
-		{ BTN_BASE2, "base2" }, /* joystick */
-#endif
-#ifdef BTN_BASE3
-		{ BTN_BASE3, "base3" }, /* joystick */
-#endif
-#ifdef BTN_BASE4
-		{ BTN_BASE4, "base4" }, /* joystick */
-#endif
-#ifdef BTN_BASE5
-		{ BTN_BASE5, "base5" }, /* joystick */
-#endif
-#ifdef BTN_BASE6
-		{ BTN_BASE6, "base6" }, /* joystick */
-#endif
-		{ 0x12c, "extra1" }, /* extra button used incorrectly by some joysticks */
-		{ 0x12d, "extra2" }, /* extra button used incorrectly by some joysticks */
-		{ 0x12e, "extra3" }, /* extra button used incorrectly by some joysticks */
-#ifdef BTN_DEAD
-		{ BTN_DEAD, "dead" }, /* not really clear what is it */
-#endif
-		/* note that the happy name has no meaning */
-		/* if not to make "happy" joysticks with many buttons */
-#ifdef BTN_TRIGGER_HAPPY1
-		{ BTN_TRIGGER_HAPPY1, "happy1" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY2
-		{ BTN_TRIGGER_HAPPY2, "happy2" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY3
-		{ BTN_TRIGGER_HAPPY3, "happy3" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY4
-		{ BTN_TRIGGER_HAPPY4, "happy4" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY5
-		{ BTN_TRIGGER_HAPPY5, "happy5" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY6
-		{ BTN_TRIGGER_HAPPY6, "happy6" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY7
-		{ BTN_TRIGGER_HAPPY7, "happy7" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY8
-		{ BTN_TRIGGER_HAPPY8, "happy8" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY9
-		{ BTN_TRIGGER_HAPPY9, "happy9" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY10
-		{ BTN_TRIGGER_HAPPY10, "happy10" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY11
-		{ BTN_TRIGGER_HAPPY11, "happy11" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY12
-		{ BTN_TRIGGER_HAPPY12, "happy12" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY13
-		{ BTN_TRIGGER_HAPPY13, "happy13" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY14
-		{ BTN_TRIGGER_HAPPY14, "happy14" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY15
-		{ BTN_TRIGGER_HAPPY15, "happy15" }, /* joystick */
-#endif
-#ifdef BTN_TRIGGER_HAPPY16
-		{ BTN_TRIGGER_HAPPY16, "happy16" }, /* joystick */
-#endif
-#ifdef BTN_A
-		{ BTN_A, "a", JOYB_A }, /* gamepad */
-#endif
-#ifdef BTN_B
-		{ BTN_B, "b", JOYB_B }, /* gamepad */
-#endif
-#ifdef BTN_C
-		{ BTN_C, "c", JOYB_C }, /* gamepad */
-#endif
-#ifdef BTN_X
-		{ BTN_X, "x", JOYB_X }, /* gamepad */
-#endif
-#ifdef BTN_Y
-		{ BTN_Y, "y", JOYB_Y }, /* gamepad */
-#endif
-#ifdef BTN_Z
-		{ BTN_Z, "z", JOYB_Z }, /* gamepad */
-#endif
-#ifdef BTN_TL
-		{ BTN_TL, "tl", JOYB_TL }, /* gamepad (top left) */
-#endif
-#ifdef BTN_TR
-		{ BTN_TR, "tr", JOYB_TR }, /* gamepad (top right) */
-#endif
-#ifdef BTN_TL2
-		{ BTN_TL2, "tl2", JOYB_TL2 }, /* gamepad (top left 2) */
-#endif
-#ifdef BTN_TR2
-		{ BTN_TR2, "tr2", JOYB_TR2 }, /* gamepad (top right 2) */
-#endif
-#ifdef BTN_SELECT
-		{ BTN_SELECT, "select", JOYB_SELECT }, /* gamepad */
-#endif
-#ifdef BTN_START
-		{ BTN_START, "start", JOYB_START }, /* gamepad */
-#endif
-#ifdef BTN_MODE
-		{ BTN_MODE, "mode", JOYB_MODE }, /* gamepad */
-#endif
-#ifdef BTN_THUMBL
-		{ BTN_THUMBL, "thumbl", JOYB_THUMBL }, /* gamepad (thumb left) */
-#endif
-#ifdef BTN_THUMBR
-		{ BTN_THUMBR, "thumbr", JOYB_THUMBR }, /* gamepad (thumb right) */
-#endif
-#ifdef BTN_PLAY
-		{ BTN_PLAY, "play", JOYB_PLAY }, /* gamepad (play) */
-#endif
-#ifdef BTN_GEAR_DOWN
-		{ BTN_GEAR_DOWN, "gear_down", JOYB_GEAR_DOWN }, /* wheel */
-#endif
-#ifdef BTN_GEAR_UP
-		{ BTN_GEAR_UP, "gear_up", JOYB_GEAR_UP }, /* wheel */
-#endif
+// 오리지널 소스 에서 linux event index 순서로 다시 정리해 본다.
 #ifdef BTN_0
 		{ BTN_0, "0" }, /* misc */
 #endif
@@ -371,26 +231,199 @@ static adv_error joystickb_setup(struct joystick_item_context* item, int f)
 #ifdef BTN_FORWARD
 		{ BTN_FORWARD, "forward" }, /* ball */
 #endif
+#ifdef BTN_BACK
+		{ BTN_BACK, "back" }, /* ball */
+#endif
+#ifdef BTN_TRIGGER
+		{ BTN_TRIGGER, "trigger" }, /* joystick */
+#endif
+#ifdef BTN_THUMB
+		{ BTN_THUMB, "thumb" }, /* joystick */
+#endif
+#ifdef BTN_THUMB2
+		{ BTN_THUMB2, "thumb2" }, /* joystick */
+#endif
+#ifdef BTN_TOP
+		{ BTN_TOP, "top" }, /* joystick */
+#endif
+#ifdef BTN_TOP2
+		{ BTN_TOP2, "top2" }, /* joystick */
+#endif
+#ifdef BTN_PINKIE
+		{ BTN_PINKIE, "pinkie" }, /* joystick */
+#endif
+#ifdef BTN_BASE
+		{ BTN_BASE, "base" }, /* joystick */
+#endif
+#ifdef BTN_BASE2
+		{ BTN_BASE2, "base2" }, /* joystick */
+#endif
+#ifdef BTN_BASE3
+		{ BTN_BASE3, "base3" }, /* joystick */
+#endif
+#ifdef BTN_BASE4
+		{ BTN_BASE4, "base4" }, /* joystick */
+#endif
+#ifdef BTN_BASE5
+		{ BTN_BASE5, "base5" }, /* joystick */
+#endif
+#ifdef BTN_BASE6
+		{ BTN_BASE6, "base6" }, /* joystick */
+#endif
+		{ 0x12c, "extra1" }, /* extra button used incorrectly by some joysticks */
+		{ 0x12d, "extra2" }, /* extra button used incorrectly by some joysticks */
+		{ 0x12e, "extra3" }, /* extra button used incorrectly by some joysticks */
+#ifdef BTN_DEAD
+		{ BTN_DEAD, "dead" }, /* not really clear what is it */
+#endif
 
-#ifdef BTN_SOUTH
+#ifdef BTN_A
+		{ BTN_A, "a", JOYB_A }, /* gamepad */
+#endif
+#if 0//def BTN_SOUTH
 		{ BTN_SOUTH, "south" }, 
 #endif
-
-#ifdef BTN_EAST
+#ifdef BTN_B
+		{ BTN_B, "b", JOYB_B }, /* gamepad */
+#endif
+#if 0 //def BTN_EAST
 		{ BTN_EAST, "east" }, 
 #endif
-
-#ifdef BTN_NORTH
+#ifdef BTN_C
+		{ BTN_C, "c", JOYB_C }, /* gamepad */
+#endif
+#ifdef BTN_X
+		{ BTN_X, "x", JOYB_X }, /* gamepad */
+#endif
+#if 0 //def BTN_NORTH
 		{ BTN_NORTH, "north" }, 
 #endif
-
-#ifdef BTN_WEST
+#ifdef BTN_Y
+		{ BTN_Y, "y", JOYB_Y }, /* gamepad */
+#endif
+#if 0 //def BTN_WEST
 		{ BTN_WEST, "west" }, 
 #endif
-
-#ifdef BTN_BACK
-		{ BTN_BACK, "back" } /* ball */
+#ifdef BTN_Z
+		{ BTN_Z, "z", JOYB_Z }, /* gamepad */
 #endif
+#ifdef BTN_TL
+		{ BTN_TL, "tl", JOYB_TL }, /* gamepad (top left) */
+#endif
+#ifdef BTN_TR
+		{ BTN_TR, "tr", JOYB_TR }, /* gamepad (top right) */
+#endif
+#ifdef BTN_TL2
+		{ BTN_TL2, "tl2", JOYB_TL2 }, /* gamepad (top left 2) */
+#endif
+#ifdef BTN_TR2
+		{ BTN_TR2, "tr2", JOYB_TR2 }, /* gamepad (top right 2) */
+#endif
+#ifdef BTN_SELECT
+		{ BTN_SELECT, "select", JOYB_SELECT }, /* gamepad */
+#endif
+#ifdef BTN_START
+		{ BTN_START, "start", JOYB_START }, /* gamepad */
+#endif
+#ifdef BTN_MODE
+		{ BTN_MODE, "mode", JOYB_MODE }, /* gamepad */
+#endif
+#ifdef BTN_THUMBL
+		{ BTN_THUMBL, "thumbl", JOYB_THUMBL }, /* gamepad (thumb left) */
+#endif
+#ifdef BTN_THUMBR
+		{ BTN_THUMBR, "thumbr", JOYB_THUMBR }, /* gamepad (thumb right) */
+#endif
+#ifdef BTN_GEAR_DOWN
+		{ BTN_GEAR_DOWN, "gear_down", JOYB_GEAR_DOWN }, /* wheel */
+#endif
+#ifdef BTN_GEAR_UP
+		{ BTN_GEAR_UP, "gear_up", JOYB_GEAR_UP }, /* wheel */
+#endif
+
+#ifdef BTN_DPAD_UP
+		{ BTN_DPAD_UP, "up", JOYB_UP }, /* joystick */
+#endif
+
+#ifdef BTN_DPAD_DOWN
+		{ BTN_DPAD_DOWN, "down", JOYB_DOWN }, /* joystick */
+#endif
+
+#ifdef BTN_DPAD_LEFT
+		{ BTN_DPAD_LEFT, "left", JOYB_LEFT }, /* joystick */
+#endif
+
+#ifdef BTN_DPAD_RIGHT
+		{ BTN_DPAD_RIGHT, "right", JOYB_RIGHT }, /* joystick */
+#endif
+		
+
+		/* note that the happy name has no meaning */
+		/* if not to make "happy" joysticks with many buttons */
+#ifdef BTN_TRIGGER_HAPPY1
+		{ BTN_TRIGGER_HAPPY1, "happy1", JOYB_HAPPY1 }, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY2
+		{ BTN_TRIGGER_HAPPY2, "happy2", JOYB_HAPPY2 }, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY3
+		{ BTN_TRIGGER_HAPPY3, "happy3", JOYB_HAPPY3 }, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY4
+		{ BTN_TRIGGER_HAPPY4, "happy4", JOYB_HAPPY4}, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY5
+		{ BTN_TRIGGER_HAPPY5, "happy5", JOYB_HAPPY5 }, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY6
+		{ BTN_TRIGGER_HAPPY6, "happy6", JOYB_HAPPY6 }, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY7
+		{ BTN_TRIGGER_HAPPY7, "happy7" }, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY8
+		{ BTN_TRIGGER_HAPPY8, "happy8" }, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY9
+		{ BTN_TRIGGER_HAPPY9, "happy9" }, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY10
+		{ BTN_TRIGGER_HAPPY10, "happy10" }, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY11
+		{ BTN_TRIGGER_HAPPY11, "happy11" }, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY12
+		{ BTN_TRIGGER_HAPPY12, "happy12" }, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY13
+		{ BTN_TRIGGER_HAPPY13, "happy13" }, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY14
+		{ BTN_TRIGGER_HAPPY14, "happy14" }, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY15
+		{ BTN_TRIGGER_HAPPY15, "happy15" }, /* joystick */
+#endif
+#ifdef BTN_TRIGGER_HAPPY16
+		{ BTN_TRIGGER_HAPPY16, "happy16" }, /* joystick */
+#endif
+
+// BTN_PLAY 존재하지 않음
+#ifdef BTN_PLAY
+		{ BTN_PLAY, "play", JOYB_PLAY } /* gamepad (play) */
+#endif
+
+
+
+
+
+
+
+
+
+
+
 	};
 
 	struct override_entry {
@@ -756,6 +789,29 @@ static adv_error joystickb_setup(struct joystick_item_context* item, int f)
 			item->bind_map[i] = i;
 		}
 	} else {
+		if (item->vendor == 0x484b && item->product == 0x1000) {
+//			target_nfo("log: trngaje:ogu\n");
+
+			for (i = 0; i < sizeof(button_map) / sizeof(button_map[0]); ++i) {
+				if (button_map[i].code == BTN_A) {
+					index_a = i;
+					name_a = button_map[i].name;
+					bind_a = button_map[i].bind;
+				}
+				else if (button_map[i].code == BTN_B) {
+					index_b = i;
+					name_b = button_map[i].name;
+					bind_b = button_map[i].bind;
+				}
+			}
+			// swap a and b
+			button_map[index_a].name = name_b;
+			button_map[index_b].name = name_a;
+			button_map[index_a].bind = bind_b;
+			button_map[index_b].bind = bind_a;
+		}
+		
+
 		/* iterate only over recognized buttons */
 		item->button_mac = 0;
 		for (i = 0; i < sizeof(button_map) / sizeof(button_map[0]); ++i) {

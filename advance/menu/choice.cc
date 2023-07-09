@@ -269,6 +269,7 @@ int choice_bag::run(const string& title, int x, int y, int dx, choice_container:
 	while (!done) {
 		draw(title, x, y, dx, pos_base, pos_rel, pos_rel_max, center);
 
+		int_update(); // add by trngaje
 		key = int_event_get();
 
 		key = menu_key(key, pos_base, pos_rel, pos_rel_max, pos_base_upper, 1, pos_max, true);
@@ -325,6 +326,7 @@ int choice_bag::run(const string& title, int x, int y, int dx, choice_container:
 		case EVENT_EXIT:
 		case EVENT_OFF:
 		case EVENT_MENU:
+		case EVENT_CANCEL:
 			done = 1;
 			break;
 		}

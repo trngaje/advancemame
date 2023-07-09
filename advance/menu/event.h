@@ -66,6 +66,9 @@
 #define EVENT_VOLUME (39 << 16)
 #define EVENT_DIFFICULTY (40 << 16)
 #define EVENT_UNASSIGNED (41 << 16)
+#define EVENT_RUNCOMMAND (42 << 16)
+#define EVENT_CANCEL (43 << 16)
+#define EVENT_CAPTURE (44 << 16)
 
 bool event_in(const std::string& s);
 void event_out(adv_conf* config_context, const char* tag);

@@ -3436,7 +3436,8 @@ unsigned int_event_get(bool update_background)
 	}
 
 #if 1 /* OSDEF: Save interface image, only for debugging. */
-	if (event_peek() == EVENT_INS) {
+	//if (event_peek() == EVENT_INS) {
+	if (event_peek() == EVENT_CAPTURE) {
 		char name[256];
 		static int ssn = 0;
 		++ssn;

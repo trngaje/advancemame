@@ -104,6 +104,9 @@ static struct event_item EVENT_TAB[] = {
 	{ "mute", EVENT_MUTE, { K(PERIOD_PAD), OP_NONE } },
 	{ "volume", EVENT_VOLUME, { OP_NONE } },
 	{ "difficulty", EVENT_DIFFICULTY, { OP_NONE } },
+	{ "runcommand", EVENT_RUNCOMMAND, { OP_NONE } },
+	{ "cancel", EVENT_CANCEL, { OP_NONE } },
+	{ "capture", EVENT_CAPTURE, { OP_NONE } },
 	{ 0, 0, { 0 } }
 };
 

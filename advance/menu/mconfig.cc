@@ -27,6 +27,8 @@
 
 #include <sstream>
 
+#include "ui_text.h"
+
 using namespace std;
 
 // --------------------------------------------------------------------------
@@ -345,6 +347,12 @@ void config_state::conf_register(adv_conf* config_context)
 	conf_string_register_default(config_context, "ui_command_menu", "Command...");
 	conf_string_register_default(config_context, "ui_command_error", "Error running the command");
 	conf_string_register_multi(config_context, "ui_command");
+	// add extra config
+	conf_string_register_default(config_context, "ui_ip", "none");
+	conf_string_register_default(config_context, "ui_battery", "none");
+	conf_string_register_default(config_context, "ui_runcommand_cfg", "none");
+	conf_bool_register_default(config_context, "ui_menu_kor", 0);
+	conf_string_register_default(config_context, "misc_languagefile", "none");
 }
 
 // -------------------------------------------------------------------------
@@ -934,6 +942,29 @@ bool config_state::load(adv_conf* config_context, bool opt_verbose)
 		resizeeffect = COMBINE_SCALEK;
 #endif
 
+	// add extra config
+	ui_ip = conf_string_get_default(config_context, "ui_ip");
+	ui_battery = conf_string_get_default(config_context, "ui_battery");
+	ui_menu_kor = conf_bool_get_default(config_context, "ui_menu_kor");
+	ui_runcommand_cfg = conf_string_get_default(config_context, "ui_runcommand_cfg");
+	
+	if (!config_path(conf_string_get_default(config_context, "misc_languagefile"), languagefile_path))
+		return false;
+	
+	target_nfo("log: misc_languagefile : %s\n", languagefile_path.c_str());
+	
+	if (languagefile_path != "none" ) {
+		FILE *fp = fopen(languagefile_path.c_str(), "r");
+		if (fp != NULL) {
+			uistring_init(fp);
+			
+			fclose(fp);
+		}
+	} 
+	else {
+		uistring_init(NULL);
+	}
+	
 	quiet = conf_bool_get_default(config_context, "misc_quiet");
 	if (!config_split(conf_string_get_default(config_context, "ui_gamemsg"), ui_gamemsg))
 		return false;
@@ -1728,7 +1759,7 @@ void config_import::import_mac(game_set& gar, config_state& config, void (config
 				// remove special chars
 				if (main_text.length() && main_text[main_text.length() - 1] == '-')
 					main_text.erase(main_text.length() - 1, 1);
-				if (main_text.length() && main_text[0] == '¥')
+				if (main_text.length() && main_text[0] == '?')
 					main_text.erase(0, 1);
 			}
 			if (main_text.length()) {

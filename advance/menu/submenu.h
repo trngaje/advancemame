@@ -45,6 +45,8 @@ void run_calib(config_state& rs);
 int run_difficulty(config_state& rs);
 void run_stat(config_state& rs);
 
+int run_runcommand(config_state& rs);
+
 #define FIRST_CHOICE_X (int_dx_get() / 20)
 #define FIRST_CHOICE_Y (int_dy_get() / 15)
 #define SECOND_CHOICE_X (FIRST_CHOICE_X + int_font_dx_get(text) * 2)

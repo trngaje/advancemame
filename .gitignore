@@ -43,6 +43,7 @@ advs
 advv
 *.exe
 *.o
+advblue
 
 # generated
 *.dif
@@ -62,3 +63,5 @@ obj/
 *.complete/
 www/
 
+#backup
+*.bak

@@ -135,6 +135,10 @@ int run_sub(config_state& rs, bool silent)
 			case EVENT_ESC:
 				done = true;
 				break;
+			case EVENT_RUNCOMMAND:
+				silent = false;
+				run_runcommand(rs);
+				break;
 			}
 		}
 

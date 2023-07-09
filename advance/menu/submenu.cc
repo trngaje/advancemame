@@ -30,6 +30,8 @@
 #include <iomanip>
 #include <algorithm>
 
+#include "ui_text.h"
+
 using namespace std;
 
 #define MSG_CHOICE_DX 30 * int_font_dx_get(menu)
@@ -76,7 +78,7 @@ int run_sort(config_state& rs)
 	if (i == ch.end())
 		i = ch.begin();
 
-	int key = ch.run(" Select Sort Mode", THIRD_CHOICE_X, THIRD_CHOICE_Y, SORT_CHOICE_DX, i);
+	int key = ch.run(string(" ") + ui_getstring(UI_select_sort_mode), THIRD_CHOICE_X, THIRD_CHOICE_Y, SORT_CHOICE_DX, i);
 
 	if (key == EVENT_ENTER) {
 		rs.sort_set((listsort_t)i->value_get());
@@ -90,68 +92,79 @@ int run_sort(config_state& rs)
 
 #define COMMAND_CHOICE_DX 33 * int_font_dx_get(menu)
 
+#define SECOND_CHOICE_DX (int_dx_get() - SECOND_CHOICE_X * 2)
+
 int run_command(config_state& rs)
 {
 	choice_bag ch;
 
+	if (event_is_visible(EVENT_RUNCOMMAND))
+		ch.insert(ch.end(), choice(ui_getstring(UI_Runcommand_), 10));
+
 	if (!rs.console_mode && rs.current_game) {
 		bool used_backdrop = false;
 		bool used_sound = false;
-
+		
 		if (rs.current_game->preview_snap_get().is_deletable()) {
-			string s = "Delete game snapshot";
+			string s = ui_getstring(UI_Delete_game_snapshot);
 			if (rs.current_game->preview_snap_get() == rs.current_backdrop) {
-				s += " (shown)";
+				s += " ";
+				s += ui_getstring(UI_shown);
 				used_backdrop = true;
 			}
 			ch.insert(ch.end(), choice(s, 0));
 		}
 		if (rs.current_game->preview_clip_get().is_deletable()) {
-			string s = "Delete game clip";
+			string s = ui_getstring(UI_Delete_game_clip);
 			if (rs.current_game->preview_clip_get() == rs.current_backdrop) {
-				s += " (shown)";
+				s += " " ;
+				s += ui_getstring(UI_shown);
 				used_backdrop = true;
 			}
 			ch.insert(ch.end(), choice(s, 1));
 		}
 		if (rs.current_game->preview_flyer_get().is_deletable()) {
-			string s = "Delete game flyer";
+			string s = ui_getstring(UI_Delete_game_flyer);
 			if (rs.current_game->preview_flyer_get() == rs.current_backdrop) {
-				s += " (shown)";
+				s += " ";
+				s += ui_getstring(UI_shown);
 				used_backdrop = true;
 			}
 			ch.insert(ch.end(), choice(s, 2));
 		}
 		if (rs.current_game->preview_cabinet_get().is_deletable()) {
-			string s = "Delete game cabinet";
+			string s = ui_getstring(UI_Delete_game_cabinet);
 			if (rs.current_game->preview_cabinet_get() == rs.current_backdrop) {
-				s += " (shown)";
+				s += " ";
+				s += ui_getstring(UI_shown);
 				used_backdrop = true;
 			}
 			ch.insert(ch.end(), choice(s, 3));
 		}
 		if (rs.current_game->preview_icon_get().is_deletable()) {
-			string s = "Delete game icon";
+			string s = ui_getstring(UI_Delete_game_icon);
 			if (rs.current_game->preview_icon_get() == rs.current_backdrop) {
-				s += " (shown)";
+				s += " ";
+				s += ui_getstring(UI_shown);
 				used_backdrop = true;
 			}
 			ch.insert(ch.end(), choice(s, 4));
 		}
 		if (!used_backdrop && rs.current_backdrop.is_deletable()) {
-			string s = "Delete shown image (from parent)";
+			string s = ui_getstring(UI_Delete_shown_image_from_parent);
 			ch.insert(ch.end(), choice(s, 5));
 		}
 		if (rs.current_game->preview_sound_get().is_deletable()) {
-			string s = "Delete game sound";
+			string s = ui_getstring(UI_Delete_game_sound);
 			if (rs.current_game->preview_sound_get() == rs.current_sound) {
-				s += " (played)";
+				s += " ";
+				s += ui_getstring(UI_played);
 				used_sound = true;
 			}
 			ch.insert(ch.end(), choice(s, 6));
 		}
 		if (!used_sound && rs.current_sound.is_deletable()) {
-			ch.insert(ch.end(), choice("Delete played sound (from parent)", 7));
+			ch.insert(ch.end(), choice(ui_getstring(UI_Delete_played_sound_from_parent), 7));
 		}
 	}
 
@@ -170,11 +183,11 @@ int run_command(config_state& rs)
 	}
 
 	if (ch.begin() == ch.end())
-		ch.insert(ch.end(), choice("No commands available", -1));
+		ch.insert(ch.end(), choice(ui_getstring(UI_No_commands_available), -1));
 
 	choice_bag::iterator i = ch.begin();
 
-	int key = ch.run(string(" ") + rs.script_menu, SECOND_CHOICE_X, SECOND_CHOICE_Y, COMMAND_CHOICE_DX, i);
+	int key = ch.run(string(" ") + rs.script_menu, SECOND_CHOICE_X, SECOND_CHOICE_Y, SECOND_CHOICE_DX, i);
 
 	if (key == EVENT_ENTER) {
 		int r;
@@ -204,6 +217,10 @@ int run_command(config_state& rs)
 			case 7:
 				r = remove(cpath_export(rs.current_sound.archive_get()));
 				break;
+			case 10:
+				key = run_runcommand(rs);
+				r=0;
+				break;	
 			case -1:
 				r = 0;
 				break;
@@ -236,7 +253,7 @@ int run_command(config_state& rs)
 			choice_bag ch;
 			ch.insert(ch.end(), choice(rs.script_error, 0));
 			choice_bag::iterator i = ch.begin();
-			ch.run(" Error", MSG_CHOICE_X, MSG_CHOICE_Y, MSG_CHOICE_DX, i);
+			ch.run(string(" ") + ui_getstring(UI_Error), MSG_CHOICE_X, MSG_CHOICE_Y, MSG_CHOICE_DX, i);
 		}
 	}
 
@@ -270,7 +287,7 @@ int run_mode(config_state& rs)
 	if (i == ch.end())
 		i = ch.begin();
 
-	int key = ch.run(" Select List Mode", THIRD_CHOICE_X, THIRD_CHOICE_Y, MODE_CHOICE_DX, i);
+	int key = ch.run(string(" ") + ui_getstring(UI_select_list_mode), THIRD_CHOICE_X, THIRD_CHOICE_Y, MODE_CHOICE_DX, i);
 
 	if (key == EVENT_ENTER) {
 		rs.mode_set((listmode_t)i->value_get());
@@ -299,7 +316,7 @@ int run_preview(config_state& rs)
 	if (i == ch.end())
 		i = ch.begin();
 
-	int key = ch.run(" Select Preview Mode", THIRD_CHOICE_X, THIRD_CHOICE_Y, PREVIEW_CHOICE_DX, i);
+	int key = ch.run(string(" ") + ui_getstring(UI_select_preview_mode), THIRD_CHOICE_X, THIRD_CHOICE_Y, PREVIEW_CHOICE_DX, i);
 
 	if (key == EVENT_ENTER) {
 		rs.preview_set((listpreview_t)i->value_get());
@@ -324,7 +341,7 @@ int run_group(config_state& rs)
 
 	choice_bag::iterator i = ch.begin();
 
-	int key = ch.run(" Include Groups", THIRD_CHOICE_X, THIRD_CHOICE_Y, GROUP_CHOICE_DX, i);
+	int key = ch.run(string(" ") + ui_getstring(UI_include_groups), THIRD_CHOICE_X, THIRD_CHOICE_Y, GROUP_CHOICE_DX, i);
 
 	if (key == EVENT_ENTER) {
 		category_container c;
@@ -399,7 +416,7 @@ int run_emu(config_state& rs)
 
 	choice_bag::iterator i = ch.begin();
 
-	int key = ch.run(" Include Emulators", SECOND_CHOICE_X, SECOND_CHOICE_Y, EMU_CHOICE_DX, i);
+	int key = ch.run(string(" ") + ui_getstring(UI_include_emulators), SECOND_CHOICE_X, SECOND_CHOICE_Y, EMU_CHOICE_DX, i);
 
 	if (key == EVENT_ENTER) {
 		emulator_container c;
@@ -487,7 +504,7 @@ int run_type(config_state& rs)
 
 	choice_bag::iterator i = ch.begin();
 
-	int key = ch.run(" Include Types", THIRD_CHOICE_X, THIRD_CHOICE_Y, TYPE_CHOICE_DX, i);
+	int key = ch.run(string(" ") + ui_getstring(UI_include_types), THIRD_CHOICE_X, THIRD_CHOICE_Y, TYPE_CHOICE_DX, i);
 
 	if (key == EVENT_ENTER) {
 		category_container c;
@@ -645,8 +662,8 @@ void run_clone(config_state& rs)
 // ------------------------------------------------------------------------
 // Calib menu
 
-#define CALIB_CHOICE_DX (40 * int_font_dx_get(menu))
-#define CALIB_CHOICE_DY (20 * int_font_dy_get(menu) + int_font_dy_get(bar))
+#define CALIB_CHOICE_DX (40 * int_font_dx_get(text))
+#define CALIB_CHOICE_DY (20 * int_font_dy_get(text) + int_font_dy_get(bar))
 #define CALIB_CHOICE_X (int_dx_get() - CALIB_CHOICE_DX) / 2
 #define CALIB_CHOICE_Y (int_dy_get() - CALIB_CHOICE_DY) / 2
 
@@ -664,7 +681,7 @@ void run_calib(config_state& rs)
 		int dy = CALIB_CHOICE_DY;
 		int dx = CALIB_CHOICE_DX;
 		int xc = x + dx / 2;
-		int y_last = y + dy - int_font_dy_get(menu);
+		int y_last = y + dy - int_font_dy_get(text);
 
 		// forced replug at every iteration, needed in case autocalib is disabled
 		int_joystick_replug();
@@ -672,13 +689,13 @@ void run_calib(config_state& rs)
 		int_box(x - 2 * border, y - border, dx + 4 * border, dy + border * 2, 1, COLOR_CHOICE_NORMAL.foreground);
 		int_clear(x - 2 * border + 1, y - border + 1, dx + 4 * border - 2, dy + border * 2 - 2, COLOR_CHOICE_NORMAL.background);
 
-		const char* d_title = "Joystick Configuration";
+		const char* d_title = ui_getstring(UI_Joystick_Configuration);
 		int w_title = int_font_dx_get(bar, d_title);
 
 		int_put(bar, xc - w_title / 2, y, dx, d_title, COLOR_CHOICE_TITLE);
 		y += int_font_dy_get(bar);
 
-		y += int_font_dy_get(menu);
+		y += int_font_dy_get(text);
 
 		int bt_line = 0;
 		int f = open("/tmp/blue.msg", O_RDONLY);
@@ -694,25 +711,25 @@ void run_calib(config_state& rs)
 
 			char* token = strtok(msg, "\n");
 			while (token) {
-				int_put_filled_center(menu, x, y, dx, token, COLOR_CHOICE_NORMAL);
-				y += int_font_dy_get(menu);
+				int_put_filled_center(text, x, y, dx, token, COLOR_CHOICE_NORMAL);
+				y += int_font_dy_get(text);
 				++bt_line;
 				token = strtok(NULL, "\n");
 			}
 		}
 
 		if (bt_line == 0) {
-			int_put_filled_center(menu, x, y, dx, "No bluetooth daemon", COLOR_CHOICE_NORMAL);
-			y += int_font_dy_get(menu);
+			int_put_filled_center(text, x, y, dx, ui_getstring(UI_No_bluetooth_daemon), COLOR_CHOICE_NORMAL);
+			y += int_font_dy_get(text);
 		}
 
-		y += int_font_dy_get(menu);
+		y += int_font_dy_get(text);
 
 		int j;
 		for (j = 0; j < joystickb_count_get(); ++j) {
 			ostringstream os;
 
-			os << "Joystick " << j + 1;
+			os << ui_getstring(UI_Joystick) << " " << j + 1;
 
 			char name[DEVICE_NAME_MAX];
 			if (joystickb_device_desc_get(j, name) == 0) {
@@ -722,8 +739,8 @@ void run_calib(config_state& rs)
 				os << " [" << name << "]";
 			}
 
-			int_put(menu, x, y, dx, os.str().c_str(), COLOR_CHOICE_TITLE);
-			y += int_font_dy_get(menu);
+			int_put(text, x, y, dx, os.str().c_str(), COLOR_CHOICE_TITLE);
+			y += int_font_dy_get(text);
 
 			if (joystickb_stick_count_get(j) != 0) {
 				ostringstream s_os;
@@ -731,8 +748,8 @@ void run_calib(config_state& rs)
 				for (int s = 0; s < joystickb_stick_count_get(j); ++s) {
 					s_os << " " << joystickb_stick_name_get(j, s);
 				}
-				int_put(menu, x, y, dx, s_os.str().c_str(), COLOR_CHOICE_NORMAL);
-				y += int_font_dy_get(menu);
+				int_put(text, x, y, dx, s_os.str().c_str(), COLOR_CHOICE_NORMAL);
+				y += int_font_dy_get(text);
 			}
 
 			if (joystickb_rel_count_get(j) != 0) {
@@ -741,8 +758,8 @@ void run_calib(config_state& rs)
 				for (int r = 0; r < joystickb_rel_count_get(j); ++r) {
 					r_os << " " << joystickb_rel_name_get(j, r);
 				}
-				int_put(menu, x, y, dx, r_os.str().c_str(), COLOR_CHOICE_NORMAL);
-				y += int_font_dy_get(menu);
+				int_put(text, x, y, dx, r_os.str().c_str(), COLOR_CHOICE_NORMAL);
+				y += int_font_dy_get(text);
 			}
 
 			if (joystickb_button_count_get(j) != 0) {
@@ -750,51 +767,57 @@ void run_calib(config_state& rs)
 				b_os << "  Buttons " << joystickb_button_count_get(j) << ":";
 				for (int b = 0; b < joystickb_button_count_get(j); ++b) {
 					b_os << " " << joystickb_button_name_get(j, b);
+					if (int_put_width(text, b_os.str()) > (dx - (4 * border + 6 * int_font_dx_get(text) ))) { // limit to display text by trngaje, 계산식 다시 고민해야 함
+						int_put(text, x, y, dx, b_os.str().c_str(), COLOR_CHOICE_NORMAL);
+						y += int_font_dy_get(text);	
+						b_os.str("");
+						b_os.clear();
+					}
 				}
-				int_put(menu, x, y, dx, b_os.str().c_str(), COLOR_CHOICE_NORMAL);
-				y += int_font_dy_get(menu);
+				int_put(text, x, y, dx, b_os.str().c_str(), COLOR_CHOICE_NORMAL);
+				y += int_font_dy_get(text);
 			}
 
-			y += int_font_dy_get(menu);
+			y += int_font_dy_get(text);
 		}
 
 		for (; j < 4; ++j) {
 			ostringstream os;
 
-			os << "Joystick " << j + 1 << " - <none>";
+			os << ui_getstring(UI_Joystick) << " " << j + 1 << " - " << ui_getstring(UI_none_);
 
-			int_put(menu, x, y, dx, os.str().c_str(), COLOR_CHOICE_TITLE);
-			y += int_font_dy_get(menu);
+			int_put(text, x, y, dx, os.str().c_str(), COLOR_CHOICE_TITLE);
+			y += int_font_dy_get(text);
 			if (y >= y_last)
 				break;
 
-			int_put(menu, x, y, dx, "  Sticks <none>", COLOR_CHOICE_NORMAL);
-			y += int_font_dy_get(menu);
+			int_put(text, x, y, dx, string("  Sticks ") + ui_getstring(UI_none_), COLOR_CHOICE_NORMAL);
+			y += int_font_dy_get(text);
 			if (y >= y_last)
 				break;
 
-			int_put(menu, x, y, dx, "  Buttons <none>", COLOR_CHOICE_NORMAL);
-			y += int_font_dy_get(menu);
+			int_put(text, x, y, dx, string("  Buttons ") + ui_getstring(UI_none_), COLOR_CHOICE_NORMAL);
+			y += int_font_dy_get(text);
 			if (y >= y_last)
 				break;
 
-			y += int_font_dy_get(menu);
+			y += int_font_dy_get(text);
 			if (y >= y_last)
 				break;
 		}
 
 		if (joystickb_count_get() == 0) {
-			const char* d_exit = "Connect one joystick to continue";
-			int w_exit = int_font_dx_get(menu, d_exit);
+			const char* d_exit = ui_getstring(UI_Connect_one_joystick_to_continue);
+			int w_exit = int_font_dx_get(text, d_exit);
 
-			int_put(menu, xc - w_exit / 2, y, w_exit, d_exit, COLOR_CHOICE_NORMAL);
-			y += int_font_dy_get(menu);
+			int_put(text, xc - w_exit / 2, y, w_exit, d_exit, COLOR_CHOICE_NORMAL);
+			y += int_font_dy_get(text);
 		} else {
-			const char* d_exit = "Press any button to continue";
-			int w_exit = int_font_dx_get(menu, d_exit);
+			const char* d_exit = ui_getstring(UI_Press_any_button_to_continue);
+			int w_exit = int_font_dx_get(text, d_exit);
 
-			int_put(menu, xc - w_exit / 2, y, w_exit, d_exit, COLOR_CHOICE_NORMAL);
-			y += int_font_dy_get(menu);
+			int_put(text, xc - w_exit / 2, y, w_exit, d_exit, COLOR_CHOICE_NORMAL);
+			y += int_font_dy_get(text);
 		}
 
 		int_update();
@@ -804,6 +827,7 @@ void run_calib(config_state& rs)
 		case EVENT_ESC:
 		case EVENT_ENTER:
 		case EVENT_UNASSIGNED:
+		case EVENT_CANCEL:
 			done = true;
 			break;
 		}
@@ -863,20 +887,22 @@ bool run_exit(config_state& rs, int key)
 {
 	choice_bag ch;
 
-	ch.insert(ch.end(), choice("Continue", 0));
+	ch.insert(ch.end(), choice(ui_getstring(UI_continue), 0));
 	switch (key) {
 	case EVENT_ESC:
 	case EVENT_EXIT:
-		ch.insert(ch.end(), choice("Exit", EVENT_EXIT));
+		ch.insert(ch.end(), choice(ui_getstring(UI_Exit), EVENT_EXIT));
 		break;
 	case EVENT_OFF:
-		ch.insert(ch.end(), choice("Shutdown", EVENT_OFF));
+		ch.insert(ch.end(), choice(ui_getstring(UI_Shutdown), EVENT_OFF));
 		break;
 	}
 
 	choice_bag::iterator i = ch.begin();
 
-	key = ch.run(" Select command", EXIT_CHOICE_X, EXIT_CHOICE_Y, EXIT_CHOICE_DX, i, true);
+	string menutitle = " ";
+	menutitle += ui_getstring(UI_select_command);
+	key = ch.run(string(" ") + ui_getstring(UI_select_command), EXIT_CHOICE_X, EXIT_CHOICE_Y, EXIT_CHOICE_DX, i, true);
 
 	if (key == EVENT_ENTER && i->value_get())
 		return true;
@@ -935,15 +961,18 @@ int run_suballmenu(config_state& rs)
 
 	rs.sub_disable(); // force the use of the default config
 	if (rs.group.size() > 1 && event_is_visible(EVENT_SETGROUP))
-		ch.insert(ch.end(), choice(menu_name(rs, "Game Group...", EVENT_SETGROUP), 7, rs.current_game != 0));
+		ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Game_Group_), EVENT_SETGROUP), 7, rs.current_game != 0));
 	if (rs.type.size() > 1 && event_is_visible(EVENT_SETTYPE))
-		ch.insert(ch.end(), choice(menu_name(rs, "Game Type...", EVENT_SETTYPE), 8, rs.current_game != 0));
-	ch.insert(ch.end(), choice("Calibration...", 9));
-	ch.insert(ch.end(), choice("Save all settings", 6));
-	ch.insert(ch.end(), choice("Restore all settings", 20));
-	ch.insert(ch.end(), choice("Clear all stats", 21));
+		ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Game_Type_), EVENT_SETTYPE), 8, rs.current_game != 0));
+	if (event_is_visible(EVENT_CALIBRATION))
+		ch.insert(ch.end(), choice(ui_getstring(UI_Calibration_), 9));
+	ch.insert(ch.end(), choice(ui_getstring(UI_Save_all_settings), 6));
+	
+	ch.insert(ch.end(), choice(ui_getstring(UI_Restore_all_settings), 20));
+	
+	ch.insert(ch.end(), choice(ui_getstring(UI_Clear_all_stats), 21));
 	if (event_is_visible(EVENT_LOCK))
-		ch.insert(ch.end(), choice(menu_name(rs, "Lock settings", EVENT_LOCK), 11));
+		ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Lock_settings), EVENT_LOCK), 11));
 
 	choice_bag::iterator i = ch.begin();
 
@@ -953,7 +982,7 @@ int run_suballmenu(config_state& rs)
 	do {
 		void* save = int_save();
 
-		key = ch.run(" Settings", SECOND_CHOICE_X, SECOND_CHOICE_Y, MENU_CHOICE_DX, i);
+		key = ch.run(string(" ") + ui_getstring(UI_Settings), SECOND_CHOICE_X, SECOND_CHOICE_Y, MENU_CHOICE_DX, i);
 
 		if (key == EVENT_ENTER) {
 			switch (i->value_get()) {
@@ -994,7 +1023,7 @@ int run_suballmenu(config_state& rs)
 				rs.lock_effective = !rs.lock_effective;
 				break;
 			}
-		} else if (key == EVENT_ESC) {
+		} else if (key == EVENT_ESC || key == EVENT_CANCEL ) {
 			done = true;
 		}
 
@@ -1015,23 +1044,23 @@ int run_subthismenu(config_state& rs)
 	choice_bag ch;
 
 	if (event_is_visible(EVENT_SORT))
-		ch.insert(ch.end(), choice(menu_name(rs, "Sort...", EVENT_SORT), 0));
+		ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Sort_), EVENT_SORT), 0));
 	if (event_is_visible(EVENT_MODE))
-		ch.insert(ch.end(), choice(menu_name(rs, "Mode...", EVENT_MODE), 1));
+		ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Mode_), EVENT_MODE), 1));
 	if (event_is_visible(EVENT_PREVIEW))
-		ch.insert(ch.end(), choice(menu_name(rs, "Preview...", EVENT_PREVIEW), 2));
+		ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Preview_), EVENT_PREVIEW), 2));
 	if (rs.group.size() > 1 && event_is_visible(EVENT_GROUP))
-		ch.insert(ch.end(), choice(menu_name(rs, "Groups...", EVENT_GROUP), 4));
+		ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Groups_), EVENT_GROUP), 4));
 	if (rs.type.size() > 1 && event_is_visible(EVENT_TYPE))
-		ch.insert(ch.end(), choice(menu_name(rs, "Types...", EVENT_TYPE), 3));
+		ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Types_), EVENT_TYPE), 3));
 	if (event_is_visible(EVENT_ATTRIB))
-		ch.insert(ch.end(), choice(menu_name(rs, "Filters...", EVENT_ATTRIB), 11, rs.include_emu_get().size() != 0));
+		ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Filters_), EVENT_ATTRIB), 11, rs.include_emu_get().size() != 0));
 
-	string title;
+	string title = " ";
 	if (rs.sub_has()) {
-		title = " Listing Emulator";
+		title += ui_getstring(UI_Listing_Emulator);
 	} else {
-		title = " Listing Multiple";
+		title += ui_getstring(UI_Listing_Multiple);
 	}
 
 	choice_bag::iterator i = ch.begin();
@@ -1089,7 +1118,7 @@ int run_subthismenu(config_state& rs)
 				}
 				break;
 			}
-		} else if (key == EVENT_ESC) {
+		} else if (key == EVENT_ESC || key == EVENT_CANCEL ) {
 			done = true;
 		}
 
@@ -1103,46 +1132,65 @@ int run_subthismenu(config_state& rs)
 	return key;
 }
 
+#define SUBMENU_CHOICE_X (int_dx_get() / 20)
+#define SUBMENU_CHOICE_Y (int_dy_get() / 15)
+#define SUBMENU_CHOICE_DX (int_dy_get() - SUBMENU_CHOICE_X * 2)
+
 int run_submenu(config_state& rs)
 {
 	choice_bag ch;
-
+	target_nfo("log: run_submenu:++\n");
+	
 	if (!rs.console_mode) {
-		ch.insert(ch.end(), choice("Listing...", 1));
-		ch.insert(ch.end(), choice("Settings...", 0));
-		if (rs.emu.size() > 1 && event_is_visible(EVENT_EMU))
-			ch.insert(ch.end(), choice(menu_name(rs, "Emulators...", EVENT_EMU), 7));
-		if (event_is_visible(EVENT_VOLUME))
-			ch.insert(ch.end(), choice(menu_name(rs, "Volume...", EVENT_VOLUME), 16));
-		if (event_is_visible(EVENT_DIFFICULTY))
-			ch.insert(ch.end(), choice(menu_name(rs, "Difficulty...", EVENT_DIFFICULTY), 17));
+		ch.insert(ch.end(), choice(ui_getstring(UI_Listing_), 1));
+		ch.insert(ch.end(), choice(ui_getstring(UI_Settings_), 0));
+
+		if (rs.emu.size() > 1 && event_is_visible(EVENT_EMU)) {
+			ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Emulators_), EVENT_EMU), 7));
+		}
+		if (event_is_visible(EVENT_VOLUME)) {
+			ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Volume_), EVENT_VOLUME), 16));
+		}
+		if (event_is_visible(EVENT_DIFFICULTY)) {
+			ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Difficulty_), EVENT_DIFFICULTY), 17));
+		}
+		
 		if (event_is_visible(EVENT_COMMAND))
 			ch.insert(ch.end(), choice(menu_name(rs, rs.script_menu, EVENT_COMMAND), 8));
-		if (event_is_visible(EVENT_CLONE))
-			ch.insert(ch.end(), choice(menu_name(rs, "Clone...", EVENT_CLONE), 15));
-		if (event_is_visible(EVENT_HELP))
-			ch.insert(ch.end(), choice(menu_name(rs, "Help", EVENT_HELP), 10));
-		ch.insert(ch.end(), choice("Statistics", 18));
+		if (event_is_visible(EVENT_CLONE)) {
+			ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Clone_), EVENT_CLONE), 15));
+		}
+		if (event_is_visible(EVENT_HELP)) {
+			ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Help), EVENT_HELP), 10));
+		}
+		ch.insert(ch.end(), choice(ui_getstring(UI_Statistics), 18));
+
 	} else {
-		if (event_is_visible(EVENT_HELP))
-			ch.insert(ch.end(), choice(menu_name(rs, "Help", EVENT_HELP), 10));
-		if (rs.emu.size() > 1 && event_is_visible(EVENT_EMU))
-			ch.insert(ch.end(), choice(menu_name(rs, "Emulators...", EVENT_EMU), 7));
-		if (event_is_visible(EVENT_VOLUME))
-			ch.insert(ch.end(), choice("Volume...", 16));
-		if (event_is_visible(EVENT_DIFFICULTY))
-			ch.insert(ch.end(), choice("Difficulty...", 17));
+		if (event_is_visible(EVENT_HELP)) {
+			ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Help), EVENT_HELP), 10));
+		}
+		if (rs.emu.size() > 1 && event_is_visible(EVENT_EMU)) {
+			ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Emulators_), EVENT_EMU), 7));
+		}
+		if (event_is_visible(EVENT_VOLUME)) {
+			ch.insert(ch.end(), choice(ui_getstring(UI_Volume_), 16));
+		}
+		if (event_is_visible(EVENT_DIFFICULTY)) {
+			ch.insert(ch.end(), choice(ui_getstring(UI_Difficulty_), 17));
+		}
 		if (event_is_visible(EVENT_COMMAND))
 			ch.insert(ch.end(), choice(menu_name(rs, rs.script_menu, EVENT_COMMAND), 8));
 	}
-
+/*
+	ch.insert(ch.end(), choice(ui_getstring(UI_Runcommand_), 30));
+*/
 	if ((rs.exit_mode == exit_esc || rs.exit_mode == exit_all || rs.exit_mode == exit_menu) && event_is_visible(EVENT_ESC)) {
-		ch.insert(ch.end(), choice(menu_name(rs, "Exit", EVENT_ESC), 19));
+		ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Exit), EVENT_ESC), 19));
 	} else if ((rs.exit_mode == exit_exit || rs.exit_mode == exit_all || rs.exit_mode == exit_menu) && event_is_visible(EVENT_EXIT)) {
-		ch.insert(ch.end(), choice(menu_name(rs, "Exit", EVENT_EXIT), 20));
+		ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Exit), EVENT_ESC), 19));
 	}
 	if ((rs.exit_mode == exit_shutdown || rs.exit_mode == exit_all || rs.exit_mode == exit_menu) && event_is_visible(EVENT_OFF)) {
-		ch.insert(ch.end(), choice(menu_name(rs, "Poweroff", EVENT_OFF), 21));
+		ch.insert(ch.end(), choice(menu_name(rs, ui_getstring(UI_Poweroff), EVENT_OFF), 21));
 	}
 
 	choice_bag::iterator i = ch.begin();
@@ -1154,8 +1202,8 @@ int run_submenu(config_state& rs)
 	do {
 		void* save = int_save();
 
-		key = ch.run(" Menu", FIRST_CHOICE_X, FIRST_CHOICE_Y, MENU_CHOICE_DX, i);
-
+		key = ch.run(string(" ") + ui_getstring(UI_Menu), SUBMENU_CHOICE_X, SUBMENU_CHOICE_Y, SUBMENU_CHOICE_DX, i);
+	
 		if (key == EVENT_ENTER) {
 			switch (i->value_get()) {
 			case 0:
@@ -1198,8 +1246,11 @@ int run_submenu(config_state& rs)
 				done = true;
 				ret = EVENT_OFF;
 				break;
+/*			case 30:
+				key = run_runcommand(rs);
+				break;		*/	
 			}
-		} else if (key == EVENT_ESC) {
+		} else if (key == EVENT_ESC || key == EVENT_CANCEL ) {
 			done = true;
 		}
 
@@ -1210,6 +1261,8 @@ int run_submenu(config_state& rs)
 
 	} while (!done);
 
+	target_nfo("log: run_submenu:--\n");
+	
 	return ret;
 }
 
@@ -1237,116 +1290,162 @@ void run_help(config_state& rs)
 		int xd = rs.ui_left + (2 + 12) * int_font_dx_get(text);
 
 		y += int_font_dy_get(text);
-		int_put_alpha(text, xt, y, "In the game menu:", COLOR_HELP_NORMAL);
+		int_put_alpha(text, xt, y, ui_getstring(UI_In_the_game_menu_), COLOR_HELP_NORMAL);
 		y += int_font_dy_get(text);
 		if (rs.console_mode) {
 			int_put_alpha(text, xt, y, event_name(EVENT_ESC), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Main menu", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Main_menu), COLOR_HELP_NORMAL);
 		} else {
 			int_put_alpha(text, xt, y, event_name(EVENT_MENU), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Main menu", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Main_menu), COLOR_HELP_NORMAL);
 		}
 		y += int_font_dy_get(text);
 		int_put_alpha(text, xt, y, event_name(EVENT_ENTER), COLOR_HELP_TAG);
-		int_put_alpha(text, xd, y, "Run the current game/On menu accept the choice", COLOR_HELP_NORMAL);
+		int_put_alpha(text, xd, y, ui_getstring(UI_Run_the_current_game_On_menu_accept_the_choice), COLOR_HELP_NORMAL);
 		y += int_font_dy_get(text);
-		if (event_is_visible(EVENT_SPACE)) {
+		if (event_name(EVENT_CANCEL) != "NONE") {
+			int_put_alpha(text, xt, y, event_name(EVENT_CANCEL), COLOR_HELP_TAG);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Cancel), COLOR_HELP_NORMAL);
+			y += int_font_dy_get(text);			
+		}
+		
+		if (event_is_visible(EVENT_SPACE) && (event_name(EVENT_SPACE) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_SPACE), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Next preview mode/On menu change the option", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Next_preview_mode_On_menu_change_the_option), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
 		}
-		if (event_is_visible(EVENT_MODE)) {
+		if (event_is_visible(EVENT_MODE) && (event_name(EVENT_MODE) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_MODE), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Next menu mode", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Next_menu_mode), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
 		}
-		if ((rs.exit_mode == exit_esc || rs.exit_mode == exit_all || rs.exit_mode == exit_menu) && event_is_visible(EVENT_ESC)) {
+		if ((rs.exit_mode == exit_esc || rs.exit_mode == exit_all || rs.exit_mode == exit_menu) && event_is_visible(EVENT_ESC) && (event_name(EVENT_ESC) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_ESC), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Exit", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Exit), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
-		} else if ((rs.exit_mode == exit_exit || rs.exit_mode == exit_all || rs.exit_mode == exit_menu) && event_is_visible(EVENT_EXIT)) {
+		} else if ((rs.exit_mode == exit_exit || rs.exit_mode == exit_all || rs.exit_mode == exit_menu) && event_is_visible(EVENT_EXIT) && (event_name(EVENT_EXIT) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_EXIT), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Exit", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Exit), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
 		}
-		if ((rs.exit_mode == exit_shutdown || rs.exit_mode == exit_all || rs.exit_mode == exit_menu) && event_is_visible(EVENT_OFF)) {
+		if ((rs.exit_mode == exit_shutdown || rs.exit_mode == exit_all || rs.exit_mode == exit_menu) && event_is_visible(EVENT_OFF) && (event_name(EVENT_OFF) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_OFF), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Shutdown", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Shutdown), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
 		}
-		if (rs.group.size() > 1 && event_is_visible(EVENT_GROUP)) {
+		if (rs.group.size() > 1 && event_is_visible(EVENT_GROUP) && (event_name(EVENT_GROUP) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_GROUP), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Next game group", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Next_game_group), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
 		}
-		if (rs.type.size() > 1 && event_is_visible(EVENT_TYPE)) {
+		if (rs.type.size() > 1 && event_is_visible(EVENT_TYPE) && (event_name(EVENT_TYPE) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_TYPE), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Next game type", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Next_game_type), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
 		}
-		if (event_is_visible(EVENT_ATTRIB)) {
+		if (event_is_visible(EVENT_ATTRIB) && (event_name(EVENT_ATTRIB) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_ATTRIB), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Include/Exclude games by attribute", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Include_Exclude_games_by_attribute), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
 		}
-		if (event_is_visible(EVENT_SORT)) {
+		if (event_is_visible(EVENT_SORT) && (event_name(EVENT_SORT) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_SORT), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Select the game sort method", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Select_the_game_sort_method), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
 		}
-		if (rs.emu.size() > 1 && event_is_visible(EVENT_EMU)) {
+		if (rs.emu.size() > 1 && event_is_visible(EVENT_EMU) && (event_name(EVENT_EMU) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_EMU), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Next emulator", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Next_emulator), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
 		}
-		if (event_is_visible(EVENT_COMMAND)) {
+		if (event_is_visible(EVENT_COMMAND) && (event_name(EVENT_COMMAND) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_COMMAND), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Commands", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Commands), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
 		}
-		if (rs.group.size() > 1 && event_is_visible(EVENT_SETGROUP)) {
+		if (rs.group.size() > 1 && event_is_visible(EVENT_SETGROUP) && (event_name(EVENT_SETGROUP) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_SETGROUP), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Change the current game group", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Change_the_current_game_group), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
 		}
-		if (rs.type.size() > 1 && event_is_visible(EVENT_SETTYPE)) {
+		if (rs.type.size() > 1 && event_is_visible(EVENT_SETTYPE) && (event_name(EVENT_SETTYPE) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_SETTYPE), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Change the current game type", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Change_the_current_game_type), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
 		}
-		if (event_is_visible(EVENT_CLONE)) {
+		if (event_is_visible(EVENT_CLONE) && (event_name(EVENT_CLONE) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_CLONE), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Run a clone", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Run_a_clone), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
 		}
-		if (event_is_visible(EVENT_ROTATE)) {
+		if (event_is_visible(EVENT_ROTATE) && (event_name(EVENT_ROTATE) != "NONE")) {
 			int_put_alpha(text, xt, y, event_name(EVENT_ROTATE), COLOR_HELP_TAG);
-			int_put_alpha(text, xd, y, "Rotate the screen", COLOR_HELP_NORMAL);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Rotate_the_screen), COLOR_HELP_NORMAL);
 			y += int_font_dy_get(text);
 		}
-
+		if (event_name(EVENT_RUNCOMMAND) != "NONE") {
+			int_put_alpha(text, xt, y, event_name(EVENT_RUNCOMMAND), COLOR_HELP_TAG);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Runcommand_), COLOR_HELP_NORMAL);
+			y += int_font_dy_get(text);
+		}
+		if (event_name(EVENT_CAPTURE) != "NONE") {
+			int_put_alpha(text, xt, y, event_name(EVENT_CAPTURE), COLOR_HELP_TAG);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Capture_the_current_screen), COLOR_HELP_NORMAL);
+			y += int_font_dy_get(text);
+		}		
+		
 		y += int_font_dy_get(text);
-		int_put_alpha(text, xt, y, "In the submenus:", COLOR_HELP_NORMAL);
+		int_put_alpha(text, xt, y, ui_getstring(UI_In_the_submenus_), COLOR_HELP_NORMAL);
 		y += int_font_dy_get(text);
 		int_put_alpha(text, xt, y, event_name(EVENT_ENTER), COLOR_HELP_TAG);
-		int_put_alpha(text, xd, y, "Accept", COLOR_HELP_NORMAL);
+		int_put_alpha(text, xd, y, ui_getstring(UI_Accept), COLOR_HELP_NORMAL);
 		y += int_font_dy_get(text);
-		int_put_alpha(text, xt, y, event_name(EVENT_DEL), COLOR_HELP_TAG);
-		int_put_alpha(text, xd, y, "Unselect all", COLOR_HELP_NORMAL);
-		y += int_font_dy_get(text);
-		int_put_alpha(text, xt, y, event_name(EVENT_INS), COLOR_HELP_TAG);
-		int_put_alpha(text, xd, y, "Select all", COLOR_HELP_NORMAL);
-		y += int_font_dy_get(text);
-		int_put_alpha(text, xt, y, event_name(EVENT_SPACE), COLOR_HELP_TAG);
-		int_put_alpha(text, xd, y, "Toggle (+ include, - exclude, * required)", COLOR_HELP_NORMAL);
-		y += int_font_dy_get(text);
-		int_put_alpha(text, xt, y, event_name(EVENT_ESC), COLOR_HELP_TAG);
-		int_put_alpha(text, xd, y, "Cancel", COLOR_HELP_NORMAL);
-		y += int_font_dy_get(text);
+		if (event_name(EVENT_CANCEL) != "NONE") {
+			int_put_alpha(text, xt, y, event_name(EVENT_CANCEL), COLOR_HELP_TAG);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Cancel), COLOR_HELP_NORMAL);
+			y += int_font_dy_get(text);			
+		}
+		if (event_name(EVENT_DEL) != "NONE") {
+			int_put_alpha(text, xt, y, event_name(EVENT_DEL), COLOR_HELP_TAG);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Unselect_all), COLOR_HELP_NORMAL);
+			y += int_font_dy_get(text);
+		}
+		if (event_name(EVENT_INS) != "NONE") {
+			int_put_alpha(text, xt, y, event_name(EVENT_INS), COLOR_HELP_TAG);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Select_all), COLOR_HELP_NORMAL);
+			y += int_font_dy_get(text);
+		}
+		if (event_name(EVENT_SPACE) != "NONE") {
+			int_put_alpha(text, xt, y, event_name(EVENT_SPACE), COLOR_HELP_TAG);
+			int_put_alpha(text, xd, y, ui_getstring(UI_Toggle_include_exclude_required), COLOR_HELP_NORMAL);
+			y += int_font_dy_get(text);
+		}
 	}
 
-	if (wait)
-		int_event_get();
+
+	
+	int_update();	
+/*	
+	if (wait) {
+		//int_event_get();
+		int_event_get(false);
+	}
+*/
+	
+	bool done = false;
+	while (!done) {
+
+		int key = int_event_get(false);
+		switch (key) {
+		case EVENT_ESC:
+		case EVENT_ENTER:
+		case EVENT_UNASSIGNED:
+		case EVENT_CANCEL:
+			done = true;
+			break;
+		}
+	}
+
 }
 
 // ------------------------------------------------------------------------
@@ -1478,14 +1577,14 @@ void run_stat(config_state& rs)
 	}
 
 	y += int_font_dy_get(text);
-	int_put_right_alpha(text, xs, y, xt - xs, "Listed", COLOR_HELP_TAG);
-	int_put_right_alpha(text, xt, y, xp - xt, "Total", COLOR_HELP_TAG);
-	int_put_right_alpha(text, xp, y, xe - xp, "Perc", COLOR_HELP_TAG);
+	int_put_right_alpha(text, xs, y, xt - xs, ui_getstring(UI_Listed), COLOR_HELP_TAG);
+	int_put_right_alpha(text, xt, y, xp - xt, ui_getstring(UI_Total), COLOR_HELP_TAG);
+	int_put_right_alpha(text, xp, y, xe - xp, ui_getstring(UI_Perc), COLOR_HELP_TAG);
 
 	{
 
 		y += int_font_dy_get(text);
-		int_put_alpha(text, xn, y, "Games", COLOR_HELP_TAG);
+		int_put_alpha(text, xn, y, ui_getstring(UI_Games), COLOR_HELP_TAG);
 		int_put_right_alpha(text, xs, y, xt - xs, stat_int(select_count), COLOR_HELP_NORMAL);
 		int_put_right_alpha(text, xt, y, xp - xt, stat_int(total_count), COLOR_HELP_NORMAL);
 		int_put_right_alpha(text, xp, y, xe - xp, stat_perc(select_count, total_count), COLOR_HELP_NORMAL);
@@ -1493,7 +1592,7 @@ void run_stat(config_state& rs)
 
 	{
 		y += int_font_dy_get(text);
-		int_put_alpha(text, xn, y, "Play", COLOR_HELP_TAG);
+		int_put_alpha(text, xn, y, ui_getstring(UI_Play), COLOR_HELP_TAG);
 		int_put_right_alpha(text, xs, y, xt - xs, stat_int(select_session), COLOR_HELP_NORMAL);
 		int_put_right_alpha(text, xt, y, xp - xt, stat_int(total_session), COLOR_HELP_NORMAL);
 		int_put_right_alpha(text, xp, y, xe - xp, stat_perc(select_session, total_session), COLOR_HELP_NORMAL);
@@ -1501,7 +1600,7 @@ void run_stat(config_state& rs)
 
 	{
 		y += int_font_dy_get(text);
-		int_put_alpha(text, xn, y, "Time", COLOR_HELP_TAG);
+		int_put_alpha(text, xn, y, ui_getstring(UI_Time), COLOR_HELP_TAG);
 		int_put_right_alpha(text, xs, y, xt - xs, stat_time(select_time), COLOR_HELP_NORMAL);
 		int_put_right_alpha(text, xt, y, xp - xt, stat_time(total_time), COLOR_HELP_NORMAL);
 		int_put_right_alpha(text, xp, y, xe - xp, stat_perc(select_time, total_time), COLOR_HELP_NORMAL);
@@ -1514,7 +1613,7 @@ void run_stat(config_state& rs)
 	if (n > 0 && most_time_map[0]) {
 		y += int_font_dy_get(text);
 		y += int_font_dy_get(text);
-		int_put_alpha(text, xn, y, "Most time", COLOR_HELP_TAG);
+		int_put_alpha(text, xn, y, ui_getstring(UI_Most_time), COLOR_HELP_TAG);
 		for (unsigned i = 0; i < n && most_time_map[i]; ++i) {
 			y += int_font_dy_get(text);
 			int_put_right_alpha(text, xn, y, xs - xn, stat_time(most_time_val[i]), COLOR_HELP_NORMAL);
@@ -1527,7 +1626,7 @@ void run_stat(config_state& rs)
 		ostringstream os;
 		y += int_font_dy_get(text);
 		y += int_font_dy_get(text);
-		int_put_alpha(text, xn, y, "Most play", COLOR_HELP_TAG);
+		int_put_alpha(text, xn, y, ui_getstring(UI_Most_play), COLOR_HELP_TAG);
 		for (unsigned i = 0; i < n && most_session_map[i]; ++i) {
 			y += int_font_dy_get(text);
 			int_put_right_alpha(text, xn, y, xs - xn, stat_int(most_session_val[i]), COLOR_HELP_NORMAL);
@@ -1540,7 +1639,7 @@ void run_stat(config_state& rs)
 		ostringstream os;
 		y += int_font_dy_get(text);
 		y += int_font_dy_get(text);
-		int_put_alpha(text, xn, y, "Most time per play", COLOR_HELP_TAG);
+		int_put_alpha(text, xn, y, ui_getstring(UI_Most_time_per_play), COLOR_HELP_TAG);
 		for (unsigned i = 0; i < n && most_timepersession_map[i]; ++i) {
 			y += int_font_dy_get(text);
 			int_put_right_alpha(text, xn, y, xs - xn, stat_time(most_timepersession_val[i]), COLOR_HELP_NORMAL);
@@ -1548,6 +1647,135 @@ void run_stat(config_state& rs)
 		}
 	}
 
-	int_event_get();
+
+	int_update();	
+//	int_event_get();
+//	int_event_get(false);
+	
+	bool done = false;
+	while (!done) {
+
+		int key = int_event_get(false);
+		switch (key) {
+		case EVENT_ESC:
+		case EVENT_ENTER:
+		case EVENT_UNASSIGNED:
+		case EVENT_CANCEL:
+			done = true;
+			break;
+		}
+	}
+
 }
 
+#define RUNCOMMAND_CHOICE_X 2 * int_font_dx_get(menu)
+#define RUNCOMMAND_CHOICE_Y 4 * int_font_dy_get(menu)
+#define RUNCOMMAND_CHOICE_DX (int_dx_get() - 2 * (RUNCOMMAND_CHOICE_X))
+
+int run_runcommand(config_state& rs)
+{
+	choice_bag ch;
+	choice_bag::iterator i;
+	
+	// emulator/game rom : rs.current_game->name_get().c_str()
+	// to extract name of emulator from rs.current_game->name_get()
+	string emulator = rs.current_game->name_get().substr(0, rs.current_game->name_get().find("/")); 
+	// to get name of rom : rs.current_game->name_without_emulator_get()
+
+    char buf[200];
+	int cnt=1;
+	
+    FILE *fp;
+	string path_runcommand = rs.ui_runcommand_cfg; //"/mnt/SDCARD/runcommand";
+	
+
+	string path_runcommand_config = path_runcommand + "/cfg/" + emulator + ".cfg";
+	string emulatorconfig = "cat " + path_runcommand_config + " | grep 'CORES' | awk -F= '{print $2}'";
+	
+	if (rs.ui_runcommand_cfg != "none") {
+		fp = popen(emulatorconfig.c_str(), "r");
+		if (fp != NULL) {
+			while (fgets(buf, sizeof(buf), fp) != NULL) {
+				char* pch = NULL;
+
+				pch = strtok(buf, "\r\n");
+
+				while (pch != NULL)
+				{
+					ch.insert(ch.end(), choice(pch, cnt++));			
+					pch = strtok(NULL, "\r\n");
+				}		
+			} 
+			
+			pclose(fp);
+		}
+	}
+	
+	string defaultconfig = "cat " + path_runcommand_config + " | grep 'DEFAULT' | awk -F= '{print $2}'";
+	string defaultemulator;
+	
+	if (rs.ui_runcommand_cfg != "none") {
+		fp = popen(defaultconfig.c_str(), "r");
+		if (fp != NULL) {
+			while (fgets(buf, sizeof(buf), fp) != NULL) {
+				// 한줄이기 때문에 정리 필요함
+				char* pch = NULL;
+
+				pch = strtok(buf, "\r\n");
+
+				while (pch != NULL)
+				{
+					defaultemulator = pch;
+					pch = strtok(NULL, "\r\n");
+				}		
+			} 
+			
+			pclose(fp);
+		}		
+	}
+	
+
+	
+	
+	if (ch.begin() == ch.end())
+		ch.insert(ch.end(), choice("No list", -1));
+	
+//	if (i == ch.end())
+		i = ch.begin();
+
+// 아래는 에러 발생함, 유사한 함수가 없을까?
+//	i = ch.find_by_value(defaultemulator);
+	
+	int key = ch.run(emulator + "(" + defaultemulator + ")", RUNCOMMAND_CHOICE_X, RUNCOMMAND_CHOICE_Y, RUNCOMMAND_CHOICE_DX, i);
+
+	if (key == EVENT_ENTER) {
+		string selected_emulator = i->desc_get();
+		choice_bag ch2;
+		// 선택된 아이템이름 : i->desc_get()
+		// 선택된 아이템 값 : i->value_get() 
+	
+		//DEFAULT=$1
+		//CORE_CONF_FILE="/home/odroid/runcommand/cfg/"$2".cfg"
+
+		//sed -i '/DEFAULT=/c\DEFAULT=\"'"${DEFAULT}"'\"' ${CORE_CONF_FILE}
+		string defaultsetcommand = "sed -i '/DEFAULT=/c\DEFAULT=" + i->desc_get() + "' " + path_runcommand_config;
+		
+		//string runcommand_setdefault = path_runcommand + "/setdefault.sh " +  selected_emulator + " " + emulator;
+		
+		fp = popen(defaultsetcommand.c_str(), "r");
+		if (fp != NULL) {
+			pclose(fp);
+		}
+
+#if 0
+		ch2.insert(ch2.end(), choice(defaultsetcommand, 0));
+		choice_bag::iterator ii = ch2.begin();
+		ch2.run(" 선택함", MSG_CHOICE_X, MSG_CHOICE_Y, MSG_CHOICE_DX, ii);	
+#endif
+	}
+	
+	return 0;
+
+
+
+}

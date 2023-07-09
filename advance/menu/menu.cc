@@ -31,6 +31,8 @@
 #include <iomanip>
 #include <algorithm>
 
+#include "ui_text.h"
+
 using namespace std;
 
 // ------------------------------------------------------------------------
@@ -249,7 +251,27 @@ void draw_tag_right_whole(font_t font, const string& s, int& xl, int& xr, int y,
 		draw_tag_right(font, s, xl, xr, y, sep, color);
 }
 
-void draw_menu_bar(const game* g, int g2, int x, int y, int dx, bool lock, bool bottom)
+
+ostringstream os_ipaddr;
+static struct timespec currTS, prevTS;
+		
+int getBatPercMMP(const config_state& rs)
+{
+    const char *cmd = rs.ui_battery.c_str();
+    int batJsonSize = 100;
+    char buf[batJsonSize];
+    int battery_number;
+
+    FILE *fp;
+    fp = popen(cmd, "r");
+    if (fgets(buf, batJsonSize, fp) != NULL) {
+		battery_number = atoi(buf);
+    }
+    pclose(fp);
+    return battery_number;
+}
+
+void draw_menu_bar(const game* g, int g2, int x, int y, int dx, bool lock, bool bottom, const config_state& rs)
 {
 	font_t font = bar;
 
@@ -260,6 +282,13 @@ void draw_menu_bar(const game* g, int g2, int x, int y, int dx, bool lock, bool 
 	int xr = dx - separator + x;
 	int xl = separator + x;
 
+	// display battery
+	if (!lock && g && rs.ui_battery != "none") {
+		ostringstream os;
+		os << setw(6) << setfill(' ') << "[" << getBatPercMMP(rs) << "%]";
+		draw_tag_right(font, os.str(), xl, xr, y, in_separator, COLOR_MENU_BAR);
+	}
+	
 	if (!lock && g) {
 		ostringstream os;
 		os << setw(4) << setfill(' ') << g2;
@@ -300,7 +329,7 @@ void draw_menu_bar(const game* g, int g2, int x, int y, int dx, bool lock, bool 
 		draw_tag_right(font, os.str(), xl, xr, y, in_separator, COLOR_MENU_BAR_TAG);
 	}
 
-	if (g) {
+	if (g && rs.ui_ip == "none") {
 		ostringstream os;
 		if (g->software_get()) {
 			string machine = g->root_get().description_tree_get();
@@ -344,7 +373,7 @@ void draw_menu_bar(const game* g, int g2, int x, int y, int dx, bool lock, bool 
 		draw_tag_right_whole(font, os.str(), xl, xr, y, in_separator, COLOR_MENU_BAR);
 	}
 
-	if (!lock && g) {
+	if (!lock && g && rs.ui_ip == "none") {
 		ostringstream os;
 		if (g->emulator_get()->tree_get()) {
 			const game* gb = &g->clone_best_get();
@@ -353,6 +382,28 @@ void draw_menu_bar(const game* g, int g2, int x, int y, int dx, bool lock, bool 
 			os << g->name_get();
 		}
 		draw_tag_left_whole(font, os.str(), xl, xr, y, in_separator, COLOR_MENU_BAR);
+	}
+
+
+	// display ip address
+	if (!lock && g && rs.ui_ip != "none") {		
+		clock_gettime(CLOCK_MONOTONIC, &currTS);
+
+		if ((currTS.tv_sec - prevTS.tv_sec) >= 1) {
+			char ipaddress[20];
+
+			FILE *fp;
+			fp = popen(rs.ui_ip.c_str(), "r");
+			if (fgets(ipaddress, sizeof(ipaddress), fp) != NULL) {
+				os_ipaddr.str("");
+				os_ipaddr.clear();
+				os_ipaddr << "[" << ipaddress << "]";				
+			}
+			pclose(fp);
+
+			clock_gettime(CLOCK_MONOTONIC, &prevTS);
+		}
+		draw_tag_left_whole(font, os_ipaddr.str(), xl, xr, y, in_separator, COLOR_MENU_BAR);
 	}
 }
 
@@ -1538,7 +1589,7 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 		if (name_dy)
 			draw_menu_window(rs.gar, gc, int_map, coln, rown, pos_base, pos_base + pos_rel, use_ident, rs.merge, rs.mode_get() == mode_tile_icon);
 		if (bar_top_dy)
-			draw_menu_bar(rs.current_game, game_count, bar_top_x, bar_top_y, bar_top_dx, rs.lock_effective, bar_bottom_dy != 0);
+			draw_menu_bar(rs.current_game, game_count, bar_top_x, bar_top_y, bar_top_dx, rs.lock_effective, bar_bottom_dy != 0, rs);
 		if (bar_bottom_dy)
 			draw_menu_info(rs.gar, rs.current_game, bar_bottom_x, bar_bottom_y, bar_bottom_dx, rs.merge, effective_preview, rs.sort_get(), rs.difficulty_effective, rs.lock_effective);
 		if (bar_right_dx) {
@@ -1731,6 +1782,7 @@ static int run_menu_user(config_state& rs, bool flipxy, menu_array& gc, sort_ite
 			case EVENT_EMU:
 			case EVENT_ROTATE:
 			case EVENT_PREVIEW:
+			case EVENT_RUNCOMMAND:
 				done = true;
 				break;
 			}
@@ -1995,7 +2047,7 @@ int run_menu_sort(config_state& rs, const pgame_sort_set& gss, sort_item_func* c
 	}
 
 	if (gc.empty()) {
-		gc.insert(gc.end(), new menu_entry("<empty>"));
+		gc.insert(gc.end(), new menu_entry(ui_getstring(UI_empty_)));
 	}
 
 	log_std(("menu: insert end\n"));
@@ -2288,15 +2340,23 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 	/* prepare a warning message if the game list is empty */
 	string empty_msg;
 	if (rs.gar.empty())
-		empty_msg = "No game was found";
-	else if (!has_emu)
-		empty_msg = "No game was found for the emulator " + emu_msg;
-	else if (!has_group)
-		empty_msg = "No game matches the group selection for " + emu_msg;
-	else if (!has_type)
-		empty_msg = "No game matches the type selection for " + emu_msg;
-	else if (!has_filter)
-		empty_msg = "No game matches the filter selection for " + emu_msg;
+		empty_msg = ui_getstring(UI_No_game_was_found);
+	else if (!has_emu) {
+		empty_msg = ui_getstring(UI_No_game_was_found_for_the_emulator);
+		empty_msg += " " + emu_msg;
+	}
+	else if (!has_group) {
+		empty_msg = ui_getstring(UI_No_game_matches_the_group_selection_for);
+		empty_msg += " " + emu_msg;
+	}
+	else if (!has_type) {
+		empty_msg = ui_getstring(UI_No_game_matches_the_type_selection_for);
+		empty_msg += " " + emu_msg;
+	}
+	else if (!has_filter) {
+		empty_msg = ui_getstring(UI_No_game_matches_the_filter_selection_for);
+		empty_msg += " " + emu_msg;
+	}
 	else
 		empty_msg = "";
 
@@ -2396,6 +2456,8 @@ int run_menu(config_state& rs, bool flipxy, bool silent)
 		case EVENT_OFF:
 		case EVENT_EXIT_FORCE:
 		case EVENT_OFF_FORCE:
+		case EVENT_RUNCOMMAND:
+		case EVENT_CANCEL:
 			done = true;
 			break;
 		}
