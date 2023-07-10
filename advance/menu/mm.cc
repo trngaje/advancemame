@@ -30,7 +30,9 @@
 
 #include <iostream>
 
+#if defined(USE_SDL)
 #include <SDL.h>
+#endif
 
 using namespace std;
 

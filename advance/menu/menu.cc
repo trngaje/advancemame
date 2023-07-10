@@ -260,7 +260,7 @@ int getBatPercMMP(const config_state& rs)
     const char *cmd = rs.ui_battery.c_str();
     int batJsonSize = 100;
     char buf[batJsonSize];
-    int battery_number;
+    int battery_number=0;
 
     FILE *fp;
     fp = popen(cmd, "r");
