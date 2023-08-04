@@ -274,6 +274,7 @@ int run_mode(config_state& rs)
 	ch.insert(ch.end(), choice("Text", mode_text));
 	ch.insert(ch.end(), choice("List", mode_list));
 	ch.insert(ch.end(), choice("List Mixed", mode_list_mixed));
+	ch.insert(ch.end(), choice("Tile 2x2", mode_tile_2x2));
 	ch.insert(ch.end(), choice("Tile Tiny", mode_tile_tiny));
 	ch.insert(ch.end(), choice("Tile Small", mode_tile_small));
 	ch.insert(ch.end(), choice("Tile Normal", mode_tile_normal));

@@ -30,7 +30,7 @@
 
 #include <iostream>
 
-#if defined(USE_SDL)
+#if defined(USE_VIDEO_SDL) || defined(USE_KEYBOARD_SDL) || defined(USE_MOUSE_SDL) || defined(USE_JOYSTICK_SDL) || defined(USE_SOUND_SDL) || defined(USE_INPUT_SDL)
 #include <SDL.h>
 #endif
 

@@ -155,7 +155,8 @@ enum listmode_t {
 	mode_tile_icon = 512,
 	mode_tile_marquee = 1024,
 	mode_list_mixed = 2048,
-	mode_text = 4096
+	mode_text = 4096,
+	mode_tile_2x2 = 8192
 };
 
 /// Type of image to display.

@@ -1004,6 +1004,19 @@ adv_error advance_input_parse_digital(unsigned* seq_map, unsigned seq_max, char*
 			return 0;
 		}
 
+		if (first && strcmp(t, "none") == 0) {
+			sskip(&p, s, " \t");
+
+			if (s[p] || c == '[') {
+				error_set("Wrong use of 'none'");
+				return -1;
+			}
+
+			seq_map[0] = DIGITAL_SPECIAL_NONE;
+
+			return 0;
+		}
+
 		if (strcmp(t, "keyboard") == 0) {
 			int board;
 			int key;

@@ -64,7 +64,8 @@ static adv_conf_enum_int OPTION_MODE[] = {
 	{ "full_mixed", mode_full_mixed },
 	{ "tile_icon", mode_tile_icon },
 	{ "tile_marquee", mode_tile_marquee },
-	{ "text", mode_text }
+	{ "text", mode_text },
+	{ "tile_2x2", mode_tile_2x2 }
 };
 
 static adv_conf_enum_int OPTION_PREVIEW[] = {
