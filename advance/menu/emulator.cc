@@ -658,7 +658,7 @@ bool mame_info::update_xml()
 	err_xml = stat(cpath_export(xml_file), &st_xml);
 
 	// if it's updated and not empty
-	if (err_xml == 0 && st_xml.st_size != 0 && st_xml.st_mtime >= st_mame.st_mtime)
+	if (err_xml == 0 && st_xml.st_size != 0/* && st_xml.st_mtime >= st_mame.st_mtime*/)
 		return true;
 
 	// if it's readonly and not empty
