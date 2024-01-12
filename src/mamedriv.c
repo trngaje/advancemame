@@ -1999,6 +1999,7 @@ const game_driver * const drivers[] =
 	DRIVER( tekipaki )	/* TP-020 (c) 1991 Toaplan */
 	DRIVER( ghox )		/* TP-021 (c) 1991 Toaplan */
 	DRIVER( dogyuun )	/* TP-022 (c) 1992 Toaplan */
+	DRIVER( dogyuunto )	/* TP-022 (c) 1992 Toaplan */
 	DRIVER( kbash )		/* TP-023 (c) 1993 Toaplan */
 	DRIVER( kbash2 )	/* bootleg */
 	DRIVER( truxton2 )	/* TP-024 (c) 1992 Toaplan */
@@ -3588,6 +3589,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tfrceacb )	/* bootleg */
 	DRIVER( twinsqua )	/* (c) 1991 Sega */
 	DRIVER( ribbit )	/* (c) 1991 Sega */
+        DRIVER( ssonicbr )      /* (c) 1992 Sega (Unreleased) */
+        DRIVER( ooparts )       /* (c) 1992 Sega (Unreleased) */
 	DRIVER( tantr )		/* (c) 1992 Sega */
 	DRIVER( tantrkor )	/* (c) 1992 Sega */
 	DRIVER( tantrbl )	/* bootleg */
@@ -3605,6 +3608,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( puyopuy2 )	/* (c) 1994 Compile + Sega license */
 	DRIVER( potopoto )	/* (c) 1994 Sega */
 	DRIVER( zunkyou )	/* (c) 1994 Sega */
+	DRIVER( headonch )      /* (c) 1994 Sega (Unreleased) */
 
 	/* Atlus Print Club 'Games' C-2 board */
 	DRIVER( pclubj )
