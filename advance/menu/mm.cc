@@ -78,11 +78,6 @@ int run_sub(config_state& rs, bool silent)
 			}
 
 			switch (key) {
-			case EVENT_HELP:
-				// replay the sound and clip
-				silent = false;
-				run_help(rs);
-				break;
 			case EVENT_GROUP:
 				// replay the sound and clip
 				silent = false;
@@ -145,6 +140,11 @@ int run_sub(config_state& rs, bool silent)
 		}
 
 		switch (key) {
+		case EVENT_HELP:
+			// replay the sound and clip
+			silent = false;
+			run_help(rs);
+			break;
 		case EVENT_LOCK:
 			rs.lock_effective = !rs.lock_effective;
 			break;
