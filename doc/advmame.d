@@ -1148,6 +1148,16 @@ Configuration
 		: G   E   G   G+F
 		: H   H   F   H+G
 
+    display_writeeffect
+	Selects how to write the video memory. In some very old video board
+	you may gain speed selecting `buffer'.
+
+	:display_writeeffect direct | buffer
+
+	Options:
+		direct - Write directly the video memory (default).
+		even - Use a buffered write.
+
     Display Color Configuration Options
 	This section describes the options used to customize the display
 	color adjustments.
@@ -2326,9 +2336,11 @@ Configuration
 		yes - Sound output without any syncronization.
 
     debug_speedmark
-	Enables or disabled the on screen speed mark. If enabled a red square
-	is displayed if the game is too slow. A red triangle when you press
-	the `turbo' key or when the game is accelerated for other reasons.
+	Enables or disables the on-screen speed mark. If enabled, a red band
+	is displayed when the game is running at a low speed. A yellow band is
+	shown when frames are skipped to maintain speed. A green band appears
+	when you press the 'turbo' key or when the game is accelerated for
+	other reasons.
 
 	:debug_speedmark yes | no
 

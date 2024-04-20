@@ -48,6 +48,10 @@
 #include "dvg.h"
 #endif
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 /***************************************************************************/
 /* Commands */
 
@@ -445,9 +449,19 @@ static void video_command(struct advance_video_context* context, struct advance_
 		}
 	}
 
-	advance_ui_direct_fast(ui_context, context->state.fastest_flag || context->state.turbo_flag);
-
-	advance_ui_direct_slow(ui_context, context->state.skip_level_disable_flag);
+	if (context->state.fastest_flag || context->state.turbo_flag) {
+		advance_ui_direct_slow(ui_context, 0);
+		advance_ui_direct_frameskip(ui_context, 0);
+		advance_ui_direct_fast(ui_context, 1);
+	} else if (context->state.skip_level_disable_flag) {
+		advance_ui_direct_slow(ui_context, 1);
+		advance_ui_direct_frameskip(ui_context, 0);
+		advance_ui_direct_fast(ui_context, 0);
+	} else {
+		advance_ui_direct_slow(ui_context, 0);
+		advance_ui_direct_frameskip(ui_context, context->state.skip_level_skip != 0);
+		advance_ui_direct_fast(ui_context, 0);
+	}
 
 	if (context->state.info_flag) {
 		char buffer[256];
@@ -801,10 +815,8 @@ static void video_done_pipeline(struct advance_video_context* context)
 {
 	/* destroy the pipeline */
 	if (context->state.blit_pipeline_flag) {
-		unsigned i;
-		for (i = 0; i < PIPELINE_BLIT_MAX; ++i)
-			video_pipeline_done(&context->state.blit_pipeline[i]);
 		video_pipeline_done(&context->state.buffer_pipeline_video);
+		video_pipeline_done(&context->state.blit_pipeline);
 		context->state.blit_pipeline_flag = 0;
 	}
 
@@ -928,6 +940,11 @@ static void* video_thread(void* void_context)
 	struct advance_safequit_context* safequit_context = &CONTEXT.safequit;
 
 	log_std(("advance:thread: thread start\n"));
+
+#ifdef _OPENMP
+	/* reserve one thread to MAME */
+	omp_set_num_threads(omp_get_max_threads() - 1);
+#endif
 
 	pthread_mutex_lock(&context->state.thread_video_mutex);
 
@@ -1686,6 +1703,11 @@ static adv_conf_enum_int OPTION_INTERLACEEFFECT[] = {
 	{ "filter", EFFECT_INTERLACE_FILTER }
 };
 
+static adv_conf_enum_int OPTION_WRITEEFFECT[] = {
+	{ "direct", 0 },
+	{ "buffer", VIDEO_COMBINE_BUFFER },
+};
+
 static adv_conf_enum_int OPTION_INDEX[] = {
 	{ "auto", MODE_FLAGS_INDEX_NONE },
 	{ "palette8", MODE_FLAGS_INDEX_PALETTE8 },
@@ -1723,6 +1745,7 @@ adv_error advance_video_init(struct advance_video_context* context, adv_conf* cf
 	conf_int_register_enum_default(cfg_context, "display_resizeeffect", conf_enum(OPTION_RESIZEEFFECT), COMBINE_AUTO);
 	conf_int_register_enum_default(cfg_context, "display_rgbeffect", conf_enum(OPTION_RGBEFFECT), EFFECT_NONE);
 	conf_int_register_enum_default(cfg_context, "display_interlaceeffect", conf_enum(OPTION_INTERLACEEFFECT), EFFECT_NONE);
+	conf_int_register_enum_default(cfg_context, "display_writeeffect", conf_enum(OPTION_WRITEEFFECT), COMBINE_NONE);
 	conf_string_register_default(cfg_context, "sync_fps", "auto");
 	conf_float_register_limit_default(cfg_context, "sync_speed", 0.1, 10.0, 1.0);
 	conf_float_register_limit_default(cfg_context, "sync_turbospeed", 0.1, 30.0, 3.0);
@@ -2014,12 +2037,8 @@ adv_error advance_video_config_load(struct advance_video_context* context, adv_c
 	log_std(("emu:video: orientation ui   %04x\n", option->ui_orientation));
 
 	context->config.combine = conf_int_get_default(cfg_context, "display_resizeeffect");
-	/* on Intel assume a fast machine */
-#if defined(__i386__) || defined(__x86_64__)
+	context->config.combine_write = conf_int_get_default(cfg_context, "display_writeeffect");
 	context->config.combine_max = COMBINE_XBR;
-#else
-	context->config.combine_max = COMBINE_SCALEK;
-#endif
 	context->config.rgb_effect = conf_int_get_default(cfg_context, "display_rgbeffect");
 	context->config.interlace_effect = conf_int_get_default(cfg_context, "display_interlaceeffect");
 	context->config.turbo_speed_factor = conf_float_get_default(cfg_context, "sync_turbospeed");

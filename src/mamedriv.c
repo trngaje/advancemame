@@ -82,6 +82,7 @@ const game_driver * const drivers[] =
 	DRIVER( mspacman )	/* (c) 1981 Midway */ /* made by Gencomp */
 	DRIVER( mspacmnf )	/* hack */
 	DRIVER( mspacmat )	/* hack */
+	DRIVER( mspactwin )	/* hack */
 	DRIVER( woodpek )
 	DRIVER( woodpeka )
 	DRIVER( mspacmab )	/* bootleg */
@@ -4907,6 +4908,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( offtwall )	/* 136090           (c) 1991 */
 	DRIVER( offtwalc )	/* 136090           (c) 1991 */
 	DRIVER( guardian )	/* 136092           (c) 1992 */
+	DRIVER( dangerex )	/* (proto)	    (c) 1992 */
 	DRIVER( relief )	/* 136093           (c) 1992 */
 	DRIVER( relief2 )	/* 136093           (c) 1992 */
 	DRIVER( arcadecl )	/* (proto)          (c) 1992 */
@@ -5877,6 +5879,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( chimerab )	/* (c) 1993 */
 	DRIVER( cybattlr )	/* (c) 1993 */
 	DRIVER( peekaboo )	/* (c) 1993 */
+	DRIVER( inyourfa )      /* (c) 1991 (North America, Prototype) */
 
 	/* Jaleco Mega System 1 games */
 	DRIVER( hayaosi1 )	/* (c) 1994 */

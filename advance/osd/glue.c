@@ -2659,16 +2659,12 @@ static int on_exit_menu(int selected)
 	sel = selected;
 
 	total = 0;
-/*
-	UI_exit_continue,
-	UI_exit_load,
-	UI_exit_save,
-	UI_exit_reset,
-	UI_exit_exit,
-*/
-	exit_menu[total].text = ui_getstring(UI_exit_continue)/*"Continue"*/;
 
-//	exit_menu[total].text = "Insert Coin";
+#ifdef MESS
+	exit_menu[total].text = ui_getstring(UI_exit_continue)/*"Continue"*/;
+#else
+	exit_menu[total].text = "Insert Coin";
+#endif
 	exit_menu[total].subtext = 0;
 	exit_menu[total].flags = 0;
 	++total;
@@ -2714,7 +2710,9 @@ static int on_exit_menu(int selected)
 		}
 		if (key0 != 0) {
 			sel = -1;
+#ifndef MESS
 			advance_input_simulate_key(context, key0, 0, 10);
+#endif
 		}
 	}
 
