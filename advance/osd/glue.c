@@ -2660,11 +2660,7 @@ static int on_exit_menu(int selected)
 
 	total = 0;
 
-#ifdef MESS
 	exit_menu[total].text = ui_getstring(UI_exit_continue)/*"Continue"*/;
-#else
-	exit_menu[total].text = "Insert Coin";
-#endif
 	exit_menu[total].subtext = 0;
 	exit_menu[total].flags = 0;
 	++total;
